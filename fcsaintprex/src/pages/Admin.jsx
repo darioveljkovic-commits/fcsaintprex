@@ -1,0 +1,159 @@
+import { useState, useEffect } from 'react'
+import { supabase, calcVO2, vo2Level, sprintLevel, GROUPS } from '../lib/supabase'
+
+export default function Admin() {
+  const [players, setPlayers] = useState([])
+  const [selectedPlayer, setSelectedPlayer] = useState('')
+  const [testType, setTestType] = useState('cooper')
+  const [testDate, setTestDate] = useState(new Date().toISOString().split('T')[0])
+  const [value, setValue] = useState('')
+  const [preview, setPreview] = useState(null)
+  const [saving, setSaving] = useState(false)
+  const [success, setSuccess] = useState('')
+
+  // New player form
+  const [newPlayer, setNewPlayer] = useState({ first_name: '', last_name: '', born: '', group_name: '+40', position: '', job: '', captain: false })
+  const [addingPlayer, setAddingPlayer] = useState(false)
+  const [playerSuccess, setPlayerSuccess] = useState('')
+
+  useEffect(() => {
+    supabase.from('players').select('*').eq('active', true).order('last_name').then(({ data }) => setPlayers(data || []))
+  }, [])
+
+  const handleValueChange = (v) => {
+    setValue(v)
+    if (!v) { setPreview(null); return }
+    const num = parseFloat(v)
+    if (testType === 'cooper' && num > 500) {
+      const vo2 = calcVO2(num)
+      const lv = vo2Level(vo2)
+      setPreview({ label: 'VO2max estimé', val: `${vo2.toFixed(1)} ml/kg/min`, level: lv.l })
+    } else if (testType === 'sprint' && num > 2) {
+      const lv = sprintLevel(num)
+      setPreview({ label: 'Résultat 30m Sprint', val: `${num.toFixed(2)} secondes`, level: lv.l })
+    } else {
+      setPreview(null)
+    }
+  }
+
+  const handleSaveTest = async () => {
+    if (!selectedPlayer || !value || !testDate) return
+    setSaving(true)
+    const { error } = await supabase.from('fitness_tests').insert({
+      player_id: selectedPlayer,
+      test_type: testType,
+      test_date: testDate,
+      value: parseFloat(value),
+    })
+    setSaving(false)
+    if (!error) {
+      setSuccess('Résultat enregistré!')
+      setValue('')
+      setPreview(null)
+      setTimeout(() => setSuccess(''), 3000)
+    }
+  }
+
+  const handleAddPlayer = async () => {
+    if (!newPlayer.first_name || !newPlayer.last_name) return
+    setAddingPlayer(true)
+    const { error } = await supabase.from('players').insert(newPlayer)
+    setAddingPlayer(false)
+    if (!error) {
+      setPlayerSuccess('Joueur ajouté!')
+      setNewPlayer({ first_name: '', last_name: '', born: '', group_name: '+40', position: '', job: '', captain: false })
+      const { data } = await supabase.from('players').select('*').eq('active', true).order('last_name')
+      setPlayers(data || [])
+      setTimeout(() => setPlayerSuccess(''), 3000)
+    }
+  }
+
+  return (
+    <div className="content">
+
+      {/* SAISIR UN TEST */}
+      <div className="card">
+        <div className="card-title">📊 Saisir un résultat de test</div>
+        <div className="form-group">
+          <label className="form-label">Joueur</label>
+          <select className="form-input" value={selectedPlayer} onChange={e => setSelectedPlayer(e.target.value)}>
+            <option value="">Sélectionner un joueur</option>
+            {players.map(p => (
+              <option key={p.id} value={p.id}>{p.first_name} {p.last_name} ({p.group_name})</option>
+            ))}
+          </select>
+        </div>
+        <div className="form-group">
+          <label className="form-label">Type de test</label>
+          <select className="form-input" value={testType} onChange={e => { setTestType(e.target.value); setValue(''); setPreview(null) }}>
+            <option value="cooper">Cooper (12 min)</option>
+            <option value="sprint">30m Sprint</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label className="form-label">Date</label>
+          <input className="form-input" type="date" value={testDate} onChange={e => setTestDate(e.target.value)} />
+        </div>
+        <div className="form-group">
+          <label className="form-label">{testType === 'cooper' ? 'Distance parcourue (mètres)' : 'Temps (secondes)'}</label>
+          <input className="form-input" type="number" step={testType === 'sprint' ? '0.01' : '1'} placeholder={testType === 'cooper' ? 'ex: 2650' : 'ex: 4.35'} value={value} onChange={e => handleValueChange(e.target.value)} />
+        </div>
+        {preview && (
+          <div className="result-preview">
+            <p style={{ fontSize: 12, color: 'var(--gray-5)' }}>{preview.label}</p>
+            <div className="val">{preview.val}</div>
+            <p style={{ fontSize: 12, color: 'var(--gray-4)' }}>{preview.level}</p>
+          </div>
+        )}
+        {success && <div className="success-msg" style={{ marginTop: 8 }}>{success}</div>}
+        <button className="btn-red" style={{ marginTop: 14 }} onClick={handleSaveTest} disabled={saving || !selectedPlayer || !value}>
+          {saving ? 'Enregistrement...' : 'Enregistrer'}
+        </button>
+      </div>
+
+      {/* AJOUTER UN JOUEUR */}
+      <div className="card">
+        <div className="card-title">➕ Ajouter un joueur</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div>
+            <label className="form-label">Prénom</label>
+            <input className="form-input" value={newPlayer.first_name} onChange={e => setNewPlayer({ ...newPlayer, first_name: e.target.value })} placeholder="Prénom" />
+          </div>
+          <div>
+            <label className="form-label">Nom</label>
+            <input className="form-input" value={newPlayer.last_name} onChange={e => setNewPlayer({ ...newPlayer, last_name: e.target.value })} placeholder="Nom" />
+          </div>
+        </div>
+        <div className="form-group" style={{ marginTop: 10 }}>
+          <label className="form-label">Date de naissance</label>
+          <input className="form-input" type="date" value={newPlayer.born} onChange={e => setNewPlayer({ ...newPlayer, born: e.target.value })} />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div>
+            <label className="form-label">Groupe</label>
+            <select className="form-input" value={newPlayer.group_name} onChange={e => setNewPlayer({ ...newPlayer, group_name: e.target.value })}>
+              {GROUPS.map(g => <option key={g} value={g}>Seniors {g}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="form-label">Poste</label>
+            <input className="form-input" value={newPlayer.position} onChange={e => setNewPlayer({ ...newPlayer, position: e.target.value })} placeholder="Milieu, Défenseur..." />
+          </div>
+        </div>
+        <div className="form-group" style={{ marginTop: 10 }}>
+          <label className="form-label">Profession</label>
+          <input className="form-input" value={newPlayer.job} onChange={e => setNewPlayer({ ...newPlayer, job: e.target.value })} placeholder="Mécanicien, Médecin..." />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <input type="checkbox" id="captain" checked={newPlayer.captain} onChange={e => setNewPlayer({ ...newPlayer, captain: e.target.checked })} />
+          <label htmlFor="captain" style={{ fontSize: 13 }}>Capitaine</label>
+        </div>
+        {playerSuccess && <div className="success-msg">{playerSuccess}</div>}
+        <button className="btn-red" onClick={handleAddPlayer} disabled={addingPlayer || !newPlayer.first_name || !newPlayer.last_name}>
+          {addingPlayer ? 'Ajout...' : 'Ajouter le joueur'}
+        </button>
+      </div>
+
+    </div>
+  )
+}
