@@ -20,6 +20,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 /* LOGIN */
 .login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(160deg, #8b0f12 0%, #c0161a 40%, #6b0a0c 100%); position: relative; }
+.login-screen::before { content: ''; position: absolute; inset: 0; background: rgba(70,0,0,0.6); }
 .login-overlay { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 20px; width: 100%; max-width: 440px; }
 .login-screen::before { content: ''; position: absolute; inset: 0; background: rgba(80,0,0,0.65); }
 .team-photo-wrap { width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
@@ -149,3 +150,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .loading { display: flex; align-items: center; justify-content: center; min-height: 200px; color: var(--gray-4); font-size: 14px; }
 .no-results { padding: 28px; text-align: center; color: var(--gray-4); font-size: 14px; }
 .success-msg { color: var(--green); font-size: 13px; margin-top: 8px; }
+
+/* HERO BANNER */
+.hero-banner { position: relative; width: 100%; height: 160px; border-radius: var(--radius); overflow: hidden; margin-bottom: 14px; }
+.hero-img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 60%, transparent 100%); display: flex; align-items: flex-end; padding: 14px 16px; }
+.hero-text { color: white; font-size: 20px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+
+/* ROLE BADGE */
+.role-badge { display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-top: 3px; }
+
+/* LOGIN OVERLAY */
+.login-overlay { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; padding: 20px; width: 100%; max-width: 360px; }
