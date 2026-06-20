@@ -47,7 +47,7 @@ export default function App() {
   }
 
   if (loading) return <div className="loading" style={{ minHeight: '100vh' }}>Chargement...</div>
-  if (!session) return <Login onLogin={() => {}} />
+  if (!session) return <Login />
 
   const displayName = currentPlayer
     ? `${currentPlayer.first_name} ${currentPlayer.last_name}`
