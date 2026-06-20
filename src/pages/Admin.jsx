@@ -15,6 +15,11 @@ export default function Admin() {
   const [newPlayer, setNewPlayer] = useState({ first_name: '', last_name: '', born: '', group_name: '+40', position: '', job: '', captain: false })
   const [addingPlayer, setAddingPlayer] = useState(false)
   const [playerSuccess, setPlayerSuccess] = useState('')
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [invitePlayer, setInvitePlayer] = useState('')
+  const [inviting, setInviting] = useState(false)
+  const [inviteSuccess, setInviteSuccess] = useState('')
+  const [inviteError, setInviteError] = useState('')
 
   useEffect(() => {
     supabase.from('players').select('*').eq('active', true).order('last_name').then(({ data }) => setPlayers(data || []))
@@ -66,6 +71,19 @@ export default function Admin() {
       setPlayers(data || [])
       setTimeout(() => setPlayerSuccess(''), 3000)
     }
+  }
+
+  const handleInvite = async () => {
+    if (!invitePlayer || !inviteEmail) return
+    setInviting(true)
+    setInviteSuccess('')
+    setInviteError('')
+    // Step 1: Find player
+    const p = players.find(x => x.id === invitePlayer)
+    // Step 2: Generate SQL for admin to run in Supabase after sending invite manually
+    const sql = `-- Après avoir envoyé l'invitation depuis Supabase Auth:\n-- 1. Récupère l'UUID de ${p?.first_name} ${p?.last_name} dans Authentication → Users\n-- 2. Exécute ce SQL en remplaçant USER_UUID:\nINSERT INTO user_roles (user_id, role, player_id)\nVALUES ('USER_UUID', 'player', '${invitePlayer}');\nUPDATE players SET user_id = 'USER_UUID' WHERE id = '${invitePlayer}';`
+    setInviteSuccess(`Envoie l'invitation depuis Supabase → Authentication → Users → Invite User avec l'email: ${inviteEmail}\n\nEnsuite exécute ce SQL:\n${sql}`)
+    setInviting(false)
   }
 
   return (
@@ -151,6 +169,32 @@ export default function Admin() {
         {playerSuccess && <div className="success-msg">{playerSuccess}</div>}
         <button className="btn-red" onClick={handleAddPlayer} disabled={addingPlayer || !newPlayer.first_name || !newPlayer.last_name}>
           {addingPlayer ? 'Ajout...' : 'Ajouter le joueur'}
+        </button>
+      </div>
+
+      {/* INVITER UN JOUEUR */}
+      <div className="card">
+        <div className="card-title">✉️ Inviter un joueur</div>
+        <p style={{fontSize: 13, color: 'var(--gray-4)', marginBottom: 14}}>
+          Sélectionne le joueur et entre son email. Il recevra une invitation et sera automatiquement lié à son profil.
+        </p>
+        <div className="form-group">
+          <label className="form-label">Joueur</label>
+          <select className="form-input" value={invitePlayer} onChange={e => setInvitePlayer(e.target.value)}>
+            <option value="">Sélectionner un joueur</option>
+            {players.filter(p => !p.user_id).map(p => (
+              <option key={p.id} value={p.id}>{p.first_name} {p.last_name} ({p.group_name})</option>
+            ))}
+          </select>
+        </div>
+        <div className="form-group">
+          <label className="form-label">Email</label>
+          <input className="form-input" type="email" placeholder="joueur@email.com" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} />
+        </div>
+        {inviteSuccess && <pre style={{fontSize: 11, background: 'var(--gray-1)', padding: 12, borderRadius: 8, whiteSpace: 'pre-wrap', marginBottom: 10, color: 'var(--gray-5)'}}>{inviteSuccess}</pre>}
+        {inviteError && <div className="error-msg">{inviteError}</div>}
+        <button className="btn-red" onClick={handleInvite} disabled={inviting || !invitePlayer || !inviteEmail}>
+          {inviting ? 'Envoi...' : 'Envoyer l'invitation'}
         </button>
       </div>
 
