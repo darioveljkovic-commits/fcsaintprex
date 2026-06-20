@@ -34,7 +34,7 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
       const ra = ROLE_ORDER[a.team_role] ?? 99
       const rb = ROLE_ORDER[b.team_role] ?? 99
       if (ra !== rb) return ra - rb
-      return `${a.last_name} ${a.first_name}`.localeCompare(`${b.last_name} ${b.first_name}`)
+      return a.last_name.localeCompare(b.last_name) || a.first_name.localeCompare(b.first_name)
     })
   }
 

@@ -153,7 +153,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 /* HERO BANNER */
 .hero-banner { position: relative; width: 100%; height: 160px; border-radius: var(--radius); overflow: hidden; margin-bottom: 14px; }
-.hero-img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.hero-img { width: 100%; height: 100%; object-fit: cover; object-position: center 60%; }
 .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 60%, transparent 100%); display: flex; align-items: flex-end; padding: 14px 16px; }
 .hero-text { color: white; font-size: 20px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
 
