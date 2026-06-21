@@ -39,8 +39,26 @@ function normalize(str) {
 function getCoords(position) {
   if (!position) return null
   const n = normalize(position)
+  // Exact / substring match first
   for (const [key, val] of Object.entries(POSITIONS)) {
     if (n.includes(key) || key.includes(n)) return val
+  }
+  // Fuzzy: check each word in position against each word in key
+  const nWords = n.split(' ').filter(w => w.length > 3)
+  for (const [key, val] of Object.entries(POSITIONS)) {
+    const kWords = key.split(' ').filter(w => w.length > 3)
+    const match = nWords.some(nw => kWords.some(kw => {
+      // Allow 1 char difference (handles double letters like millieu vs milieu)
+      if (Math.abs(nw.length - kw.length) > 2) return false
+      let diff = 0
+      const shorter = nw.length < kw.length ? nw : kw
+      const longer = nw.length < kw.length ? kw : nw
+      for (let i = 0; i < shorter.length; i++) {
+        if (shorter[i] !== longer[i]) diff++
+      }
+      return diff <= 1
+    }))
+    if (match && val) return val
   }
   return null
 }

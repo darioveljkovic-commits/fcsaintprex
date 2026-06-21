@@ -175,7 +175,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .player-card { position: relative; }
 .player-age { font-size: 11px; font-weight: 700; color: var(--red); background: var(--red-light); padding: 1px 6px; border-radius: 10px; }
 .player-born { font-size: 10px; color: var(--gray-4); margin-top: 2px; }
-.player-inactive { opacity: 0.5; background: var(--gray-2) !important; }
+.player-inactive { 
+  background: #e8e8e8 !important; 
+  border: 1.5px solid #bbb !important;
+}
+.player-inactive .player-avatar { background: #ccc; color: #666; border-color: #999; }
+.player-inactive .player-name { color: #555; }
+.player-inactive .player-pos { color: #888; }
+.player-inactive .player-born { color: #999; }
+.player-inactive .player-age { background: #ddd; color: #666; }
+.player-inactive .player-group-tag { background: #ddd; color: #777; }
 
 .field-avatar.field-selected { border-color: white; box-shadow: 0 0 0 2px var(--red); }
 

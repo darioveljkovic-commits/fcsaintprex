@@ -69,10 +69,20 @@ export default function App() {
 
       <div className="nav-tabs">
         <div className={`nav-tab${activeTab === 'joueurs' ? ' active' : ''}`} onClick={() => setActiveTab('joueurs')}>
-          <span className="nav-icon">🔴</span> Joueurs
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginRight:5,verticalAlign:-2}}>
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 2a10 10 0 0 1 6.56 2.45L12 12 5.44 4.45A10 10 0 0 1 12 2z" fill="currentColor" opacity=".3"/>
+            <path d="m12 12 6.56 7.55A10 10 0 0 1 5.44 19.55L12 12z" fill="currentColor" opacity=".3"/>
+          </svg>Joueurs
         </div>
         <div className={`nav-tab${activeTab === 'postes' ? ' active' : ''}`} onClick={() => setActiveTab('postes')}>
-          <span className="nav-icon">🟩</span> Postes
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginRight:5,verticalAlign:-2}}>
+            <rect x="2" y="3" width="20" height="18" rx="1"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <circle cx="12" cy="12" r="3"/>
+            <line x1="8" y1="3" x2="8" y2="21"/>
+            <line x1="16" y1="3" x2="16" y2="21"/>
+          </svg>Postes
         </div>
         <div className={`nav-tab${activeTab === 'fitness' ? ' active' : ''}`} onClick={() => setActiveTab('fitness')}>
           <span className="nav-icon">📈</span> Fitness

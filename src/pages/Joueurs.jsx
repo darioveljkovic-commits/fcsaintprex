@@ -39,10 +39,10 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
       if (b.team_role === 'coach') return 1
       if (a.team_role === 'assistant_coach') return -1
       if (b.team_role === 'assistant_coach') return 1
-      // Ascending by birthdate: oldest first (smallest year = oldest)
-      const da = a.born || '9999'
-      const db = b.born || '9999'
-      return da.localeCompare(db)
+      // Ascending age display: youngest first = latest birthdate first
+      const da = a.born || '0000'
+      const db = b.born || '0000'
+      return db.localeCompare(da)
     })
   }
 
