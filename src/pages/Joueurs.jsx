@@ -35,12 +35,11 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
 
   const sortPlayers = (list) => {
     return [...list].sort((a, b) => {
-      // Coach always first
       if (a.team_role === 'coach') return -1
       if (b.team_role === 'coach') return 1
       if (a.team_role === 'assistant_coach') return -1
       if (b.team_role === 'assistant_coach') return 1
-      // Then by birthdate ascending
+      // Ascending by birthdate: oldest first (smallest year = oldest)
       const da = a.born || '9999'
       const db = b.born || '9999'
       return da.localeCompare(db)
@@ -98,12 +97,12 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
                   }
                   <div className="player-name">
                     {p.first_name} {p.last_name}
-                    {p.team_role === 'captain' && <span className="captain-tag">C</span>}
+                    {p.team_role === 'captain' && <span className="captain-tag" style={{background:'#FFD700',color:'#5a4500'}}>C</span>}
                     {p.team_role === 'vice_captain' && <span className="captain-tag" style={{background:'#aaa',color:'white'}}>C</span>}
                   </div>
                   <div className="player-pos">{p.preferred_position || p.position || '—'}</div>
                   {p.born && <div className="player-born">{p.born.split('-').reverse().join('.')}</div>}
-                  {p.team_role && ROLE_LABEL[p.team_role] && (
+                  {p.team_role && ['coach','assistant_coach'].includes(p.team_role) && (
                     <span className="role-badge" style={{background: ROLE_COLOR[p.team_role], color: ROLE_TEXT[p.team_role]}}>
                       {ROLE_LABEL[p.team_role]}
                     </span>

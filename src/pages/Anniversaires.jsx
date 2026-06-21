@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
-import { supabase, getAge, nextBday } from '../lib/supabase'
+import { supabase, getAge, nextBday, GROUPS } from '../lib/supabase'
 
 export default function Anniversaires() {
   const [players, setPlayers] = useState([])
+  const [activeGroup, setActiveGroup] = useState('all')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -12,14 +13,22 @@ export default function Anniversaires() {
     })
   }, [])
 
+  const filtered = activeGroup === 'all' ? players : players.filter(p => p.group_name === activeGroup)
+
   if (loading) return <div className="loading">Chargement...</div>
 
   return (
     <div className="content">
+      <div className="group-tabs">
+        <div className={`group-tab${activeGroup === 'all' ? ' active' : ''}`} onClick={() => setActiveGroup('all')}>Tous</div>
+        {GROUPS.map(g => (
+          <div key={g} className={`group-tab${g === activeGroup ? ' active' : ''}`} onClick={() => setActiveGroup(g)}>{g}</div>
+        ))}
+      </div>
       <div className="card">
-        <div className="card-title">🎂 Anniversaires de l'équipe</div>
+        <div className="card-title">🎂 Anniversaires</div>
         <div className="bday-list">
-          {players.map(p => {
+          {filtered.map(p => {
             if (!p.born) return null
             const d = new Date(p.born)
             const lbl = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')} — ${getAge(p.born)} ans`
