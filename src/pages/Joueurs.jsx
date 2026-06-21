@@ -54,7 +54,11 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
         (p.passions || '').toLowerCase().includes(search.toLowerCase()) ||
         p.group_name.includes(search)
       )
-    : sortPlayers(players.filter(p => p.group_name === activeGroup))
+    : [
+        ...sortPlayers(players.filter(p => p.group_name === activeGroup && p.active !== false)),
+        ...players.filter(p => p.group_name === activeGroup && p.active === false)
+          .sort((a,b) => (a.born||'9999').localeCompare(b.born||'9999'))
+      ]
 
   const groupLabel = { '+30': 'Seniors +30', '+40': 'Seniors +40', '+50': 'Seniors +50' }
 
