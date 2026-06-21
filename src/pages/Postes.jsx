@@ -53,7 +53,7 @@ function getCoords(position) {
   const n = norm(position)
   
   // Skip null positions
-  if (['remplacement', 'entraineur', 'coach', 'assistant'].some(s => n.includes(s))) return null
+  if (['remplacement', 'entraineur', 'coach'].some(s => n === s || n.startsWith(s + ' '))) return null
 
   // Try exact match first
   if (POSITION_COORDS[n] !== undefined) return POSITION_COORDS[n]
