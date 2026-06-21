@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase, GROUPS } from '../lib/supabase'
+import { supabase, GROUPS, getAge } from '../lib/supabase'
 import PlayerModal from '../components/PlayerModal'
 
 const TEAM_PHOTOS = {
@@ -35,12 +35,15 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
 
   const sortPlayers = (list) => {
     return [...list].sort((a, b) => {
-      const ra = ROLE_ORDER[a.team_role] !== undefined ? ROLE_ORDER[a.team_role] : 99
-      const rb = ROLE_ORDER[b.team_role] !== undefined ? ROLE_ORDER[b.team_role] : 99
-      if (ra !== rb) return ra - rb
-      const lastCmp = (a.last_name || '').localeCompare(b.last_name || '', 'fr')
-      if (lastCmp !== 0) return lastCmp
-      return (a.first_name || '').localeCompare(b.first_name || '', 'fr')
+      // Coach always first
+      if (a.team_role === 'coach') return -1
+      if (b.team_role === 'coach') return 1
+      if (a.team_role === 'assistant_coach') return -1
+      if (b.team_role === 'assistant_coach') return 1
+      // Then by birthdate ascending
+      const da = a.born || '9999'
+      const db = b.born || '9999'
+      return da.localeCompare(db)
     })
   }
 
@@ -85,16 +88,21 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
           ? <div className="no-results">Aucun joueur trouvé</div>
           : <div className="player-grid">
               {filtered.map(p => (
-                <div key={p.id} className="player-card" onClick={() => setSelected(p)}>
+                <div key={p.id} className={`player-card${!p.active ? ' player-inactive' : ''}`} onClick={() => setSelected(p)}>
+                  <div className="player-card-top">
+                    {p.born && <span className="player-age">{getAge(p.born)}</span>}
+                  </div>
                   {p.photo_url
                     ? <img src={p.photo_url} className="player-photo" alt={p.last_name} />
                     : <div className="player-avatar">{initials(p)}</div>
                   }
                   <div className="player-name">
                     {p.first_name} {p.last_name}
-                    {p.captain && <span className="captain-tag">C</span>}
+                    {p.team_role === 'captain' && <span className="captain-tag">C</span>}
+                    {p.team_role === 'vice_captain' && <span className="captain-tag" style={{background:'#aaa',color:'white'}}>C</span>}
                   </div>
                   <div className="player-pos">{p.preferred_position || p.position || '—'}</div>
+                  {p.born && <div className="player-born">{p.born.split('-').reverse().join('.')}</div>}
                   {p.team_role && ROLE_LABEL[p.team_role] && (
                     <span className="role-badge" style={{background: ROLE_COLOR[p.team_role], color: ROLE_TEXT[p.team_role]}}>
                       {ROLE_LABEL[p.team_role]}

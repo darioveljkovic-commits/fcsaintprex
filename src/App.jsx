@@ -5,6 +5,7 @@ import Joueurs from './pages/Joueurs'
 import Fitness from './pages/Fitness'
 import Anniversaires from './pages/Anniversaires'
 import Admin from './pages/Admin'
+import Postes from './pages/Postes'
 import './App.css'
 
 const LOGO = 'https://fcsaintprex.ch/wp-content/uploads/2021/09/cropped-logo_fc_saint_prex.jpg'
@@ -51,14 +52,14 @@ export default function App() {
 
   const displayName = currentPlayer
     ? `${currentPlayer.first_name} ${currentPlayer.last_name}`
-    : isAdmin ? 'Coach / Admin' : 'Utilisateur'
+    : 'FC St-Prex Seniors'
 
   return (
     <>
       <div className="topbar">
         <div className="topbar-left">
           <img src={LOGO} alt="logo" onError={e => e.target.style.display='none'} />
-          <h2>FC SAINT-PREX</h2>
+          <h2>FC St-Prex Seniors</h2>
         </div>
         <div className="topbar-right">
           <span className="user-badge">{displayName}{isAdmin ? ' (Coach)' : ''}</span>
@@ -76,6 +77,9 @@ export default function App() {
         <div className={`nav-tab${activeTab === 'anniversaires' ? ' active' : ''}`} onClick={() => setActiveTab('anniversaires')}>
           <span className="nav-icon">🎂</span> Anniversaires
         </div>
+        <div className={`nav-tab${activeTab === 'postes' ? ' active' : ''}`} onClick={() => setActiveTab('postes')}>
+          <span className="nav-icon">🏟️</span> Postes
+        </div>
         {isAdmin && <div className={`nav-tab${activeTab === 'admin' ? ' active' : ''}`} onClick={() => setActiveTab('admin')}>
           <span className="nav-icon">⚙️</span> Admin
         </div>}
@@ -84,6 +88,7 @@ export default function App() {
       {activeTab === 'joueurs' && <Joueurs currentPlayer={currentPlayer} isAdmin={isAdmin} />}
       {activeTab === 'fitness' && <Fitness currentPlayer={currentPlayer} isAdmin={isAdmin} />}
       {activeTab === 'anniversaires' && <Anniversaires />}
+      {activeTab === 'postes' && <Postes currentPlayer={currentPlayer} isAdmin={isAdmin} />}
       {activeTab === 'admin' && isAdmin && <Admin />}
     </>
   )

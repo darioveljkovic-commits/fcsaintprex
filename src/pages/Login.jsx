@@ -26,13 +26,13 @@ export default function Login() {
       <div className="login-overlay">
         <div className="login-box">
           <img src={LOGO} alt="FC Saint-Prex" onError={e => e.target.style.display='none'} />
-          <h1>FC SAINT-PREX</h1>
+          <h1>FC St-Prex Seniors</h1>
           <p>Laissons dire et faisons bien</p>
           <form onSubmit={handleLogin}>
             <label className="form-label">Email</label>
-            <input className="form-input" type="email" placeholder="votre@email.com" value={email} onChange={e => setEmail(e.target.value)} required />
+            <input className="form-input" type="email" placeholder="votre@email.com" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} required />
             <label className="form-label">Mot de passe</label>
-            <input className="form-input" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required />
+            <input className="form-input" type="password" placeholder="••••••••" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} required />
             {error && <div className="error-msg">{error}</div>}
             <button className="btn-primary" type="submit" disabled={loading} style={{marginTop: '8px'}}>
               {loading ? 'Connexion...' : 'Se connecter'}
