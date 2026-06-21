@@ -20,7 +20,7 @@ const POSITION_MAP = {
   'attaque centrale': { x: 50, y: 22 },
   'attaque de pointe': { x: 50, y: 18 },
   'pointe attaque droite': { x: 68, y: 24 },
-  'pointe d'attaque droite': { x: 68, y: 24 },
+  "pointe d'attaque droite": { x: 68, y: 24 },
   'remplacement': null,
   'entraîneur': null,
 }
