@@ -163,6 +163,12 @@ export default function Postes({ currentPlayer, isAdmin }) {
         <div className={`test-tab${activeView === 'pref' ? ' active' : ''}`}
           onClick={() => { setActiveView('pref'); setSelected(null) }}>Préférence</div>
       </div>
+      <div style={{fontSize:12,color:'var(--gray-4)',background:'var(--gray-1)',borderRadius:8,padding:'8px 12px',marginBottom:12,lineHeight:1.6}}>
+        {activeView === 'poste'
+          ? <span>🔵 <strong style={{color:'var(--gray-5)'}}>Poste</strong> — attribué par le coach selon les matchs.</span>
+          : <span>🟢 <strong style={{color:'var(--gray-5)'}}>Préférence</strong> — où tu aimes jouer idéalement. À renseigner dans ton profil.</span>
+        }
+      </div>
 
       {activeView === 'pref' && onField.length === 0 && sidebar.length > 0 && (
         <div style={{background:'#fff8e1',border:'1px solid #f0c040',borderRadius:8,padding:'10px 14px',fontSize:13,color:'#856404',marginBottom:12}}>
