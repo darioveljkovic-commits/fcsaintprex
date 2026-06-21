@@ -194,7 +194,7 @@ export default function Admin() {
         {inviteSuccess && <pre style={{fontSize: 11, background: 'var(--gray-1)', padding: 12, borderRadius: 8, whiteSpace: 'pre-wrap', marginBottom: 10, color: 'var(--gray-5)'}}>{inviteSuccess}</pre>}
         {inviteError && <div className="error-msg">{inviteError}</div>}
         <button className="btn-red" onClick={handleInvite} disabled={inviting || !invitePlayer || !inviteEmail}>
-          {inviting ? 'Envoi...' : 'Envoyer l'invitation'}
+          {inviting ? 'Envoi...' : "Envoyer l'invitation"}
         </button>
       </div>
 
