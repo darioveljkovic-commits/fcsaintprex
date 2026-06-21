@@ -22,7 +22,7 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
   const [loading, setLoading] = useState(true)
 
   const fetchData = async () => {
-    const { data: pData } = await supabase.from('players').select('*').eq('active', true).order('last_name')
+    const { data: pData } = await supabase.from('players').select('*').order('last_name')
     const { data: tData } = await supabase.from('fitness_tests').select('*')
     setPlayers(pData || [])
     setTests(tData || [])

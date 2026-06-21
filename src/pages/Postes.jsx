@@ -38,23 +38,29 @@ function getCoords(position) {
 function placePlayers(players, getPos) {
   const onField = []
   const sidebar = []
-  const usedSpots = []
+  const groups = {}
 
   players.forEach(p => {
-    let pos = getPos(p)
+    const pos = getPos(p)
     if (!pos) { sidebar.push(p); return }
-    let { x, y } = pos
-    let attempts = 0
-    while (usedSpots.some(s => Math.abs(s.x - x) < 14 && Math.abs(s.y - y) < 10) && attempts < 30) {
-      x = pos.x + (attempts % 2 === 0 ? 1 : -1) * Math.ceil(attempts / 2) * 7
-      y = pos.y + (Math.random() - 0.5) * 6
-      x = Math.max(8, Math.min(92, x))
-      y = Math.max(5, Math.min(96, y))
-      attempts++
-    }
-    usedSpots.push({ x, y })
-    onField.push({ ...p, _x: x, _y: y })
+    const key = `${Math.round(pos.x)}_${Math.round(pos.y)}`
+    if (!groups[key]) groups[key] = { pos, players: [] }
+    groups[key].players.push(p)
   })
+
+  Object.values(groups).forEach(({ pos, players }) => {
+    const n = players.length
+    players.forEach((p, i) => {
+      let x = pos.x
+      if (n > 1) {
+        const spread = (n - 1) * 12
+        x = pos.x - spread / 2 + i * 12
+        x = Math.max(8, Math.min(92, x))
+      }
+      onField.push({ ...p, _x: x, _y: pos.y })
+    })
+  })
+
   return { onField, sidebar }
 }
 
@@ -66,7 +72,7 @@ export default function Postes({ currentPlayer, isAdmin }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase.from('players').select('*').eq('active', true).then(({ data }) => {
+    supabase.from('players').select('*').then(({ data }) => {
       setPlayers(data || [])
       setLoading(false)
     })

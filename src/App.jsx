@@ -69,10 +69,10 @@ export default function App() {
 
       <div className="nav-tabs">
         <div className={`nav-tab${activeTab === 'joueurs' ? ' active' : ''}`} onClick={() => setActiveTab('joueurs')}>
-          <span className="nav-icon">⚽</span> Joueurs
+          <span className="nav-icon">🔴</span> Joueurs
         </div>
         <div className={`nav-tab${activeTab === 'postes' ? ' active' : ''}`} onClick={() => setActiveTab('postes')}>
-          <span className="nav-icon">🏟️</span> Postes
+          <span className="nav-icon">🟩</span> Postes
         </div>
         <div className={`nav-tab${activeTab === 'fitness' ? ' active' : ''}`} onClick={() => setActiveTab('fitness')}>
           <span className="nav-icon">📈</span> Fitness
