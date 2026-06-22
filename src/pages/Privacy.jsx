@@ -19,7 +19,7 @@ export default function Privacy({ onClose }) {
           <p style={{marginBottom:12}}>Chaque joueur accède uniquement à son propre profil complet. Les membres de l'équipe voient les informations de base des autres joueurs (nom, poste, photo). Les coachs et administrateurs ont accès à l'ensemble des données.</p>
 
           <p style={{marginBottom:8,fontWeight:600}}>Hébergement</p>
-          <p style={{marginBottom:12}}>Les données sont hébergées sur Supabase (serveurs UE) et Vercel, deux plateformes conformes au RGPD.</p>
+          <p style={{marginBottom:12}}>Les données sont hébergées sur Supabase (serveurs UE, Irlande) et Vercel, deux plateformes conformes au RGPD et à la LPD révisée suisse (en vigueur depuis le 1er septembre 2023).</p>
 
           <p style={{marginBottom:8,fontWeight:600}}>Durée de conservation</p>
           <p style={{marginBottom:12}}>Les données sont conservées pendant la durée de l'affiliation au club. En cas de départ, le statut est mis à jour. Sur demande explicite, les données peuvent être supprimées définitivement.</p>

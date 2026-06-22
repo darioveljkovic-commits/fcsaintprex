@@ -30,7 +30,7 @@ export default function Consent({ currentPlayer, onAccept }) {
         </p>
 
         <div style={{background:'var(--gray-1)',borderRadius:8,padding:'10px 14px',marginBottom:20,fontSize:12,color:'var(--gray-4)',lineHeight:1.6}}>
-          Tes données sont utilisées uniquement en interne par le FC Amical Saint-Prex et ne sont pas transmises à des tiers.
+          Tes données sont utilisées uniquement en interne par le FC Amical Saint-Prex, ne sont pas transmises à des tiers, et sont hébergées sur des serveurs situés en Europe (UE).
           <span style={{color:'var(--red)',cursor:'pointer',marginLeft:4,fontWeight:600}} onClick={() => setShowPrivacy(true)}>
             Lire la politique complète →
           </span>
@@ -65,7 +65,7 @@ export default function Consent({ currentPlayer, onAccept }) {
               <p style={{marginBottom:8,fontWeight:600}}>Accès</p>
               <p style={{marginBottom:12}}>Chaque joueur voit son propre profil. Les membres voient les infos de base des autres. Les admins ont accès complet.</p>
               <p style={{marginBottom:8,fontWeight:600}}>Hébergement</p>
-              <p style={{marginBottom:12}}>Supabase et Vercel, conformes RGPD, serveurs UE.</p>
+              <p style={{marginBottom:12}}>Supabase (serveurs UE, Irlande) et Vercel, tous deux conformes au RGPD et à la LPD révisée (Suisse, en vigueur depuis le 1er septembre 2023).</p>
               <p style={{marginBottom:8,fontWeight:600}}>Conservation</p>
               <p style={{marginBottom:12}}>Durée de l'affiliation. Suppression sur demande explicite.</p>
               <p style={{marginBottom:8,fontWeight:600}}>Vos droits</p>
