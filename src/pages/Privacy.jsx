@@ -28,7 +28,7 @@ export default function Privacy({ onClose }) {
           <p style={{marginBottom:12}}>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Pour toute demande, contactez les administrateurs du club via l'application.</p>
 
           <p style={{marginBottom:8,fontWeight:600}}>Responsable du traitement</p>
-          <p>FC Amical Saint-Prex — Équipes Seniors. Contact via les administrateurs enregistrés dans l'application (Dario Veljkovic, Gildas Genty).</p>
+          <p>FC Amical Saint-Prex — Équipes Seniors. Contact via les administrateurs du club enregistrés dans l'application.</p>
         </div>
       </div>
     </div>

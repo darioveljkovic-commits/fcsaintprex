@@ -69,7 +69,7 @@ export default function Consent({ currentPlayer, onAccept }) {
               <p style={{marginBottom:8,fontWeight:600}}>Conservation</p>
               <p style={{marginBottom:12}}>Durée de l'affiliation. Suppression sur demande explicite.</p>
               <p style={{marginBottom:8,fontWeight:600}}>Vos droits</p>
-              <p style={{marginBottom:12}}>Accès, rectification et suppression via les administrateurs (Dario Veljkovic, Gildas Genty).</p>
+              <p style={{marginBottom:12}}>Accès, rectification et suppression via les administrateurs du club.</p>
             </div>
           </div>
         </div>
