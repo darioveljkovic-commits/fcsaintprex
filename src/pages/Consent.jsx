@@ -41,7 +41,7 @@ export default function Consent({ currentPlayer, onAccept }) {
           disabled={loading}
           style={{width:'100%',background:'var(--red)',color:'white',border:'none',padding:'14px',borderRadius:8,fontSize:15,fontWeight:700,cursor:'pointer',marginBottom:10}}
         >
-          {loading ? 'Enregistrement...' : 'J'accepte et je continue'}
+          {loading ? 'Enregistrement...' : "J'accepte et je continue"}
         </button>
 
         <p style={{fontSize:11,color:'var(--gray-4)',textAlign:'center',lineHeight:1.5}}>
