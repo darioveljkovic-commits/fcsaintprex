@@ -17,25 +17,38 @@ const SUPABASE_URL = 'https://lymeedgkdurumfdpmitl.supabase.co'
 const SUPABASE_STORAGE = SUPABASE_URL + '/storage/v1/object/public/player-photos'
 
 function AvatarImg({ player, displayName }) {
-  const [err, setErr] = React.useState(false)
+  const [photoUrl, setPhotoUrl] = React.useState(null)
+  const [loaded, setLoaded] = React.useState(false)
+
+  React.useEffect(() => {
+    if (!player?.id) return
+    supabase.from('players').select('photo_url').eq('id', player.id).single()
+      .then(({ data }) => { if (data?.photo_url) setPhotoUrl(data.photo_url.split('?')[0]) })
+  }, [player?.id])
+
   const initials = player
     ? `${player.first_name?.[0] ?? ''}${player.last_name?.[0] ?? ''}`
     : 'FC'
-  const url = player?.photo_url ? player.photo_url.split('?')[0] : null
-  if (!url || err) {
-    return (
-      <span style={{color:'white',fontWeight:700,fontSize:14,userSelect:'none'}}>
-        {initials}
-      </span>
-    )
-  }
+
   return (
-    <img
-      src={url}
-      alt={displayName}
-      style={{width:38,height:38,objectFit:'cover',display:'block',margin:0,padding:0,flexShrink:0}}
-      onError={() => setErr(true)}
-    />
+    <div style={{width:'100%',height:'100%',position:'relative',overflow:'hidden'}}>
+      {photoUrl && (
+        <img
+          src={photoUrl}
+          alt={displayName}
+          style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}
+          onLoad={() => setLoaded(true)}
+          onError={() => setPhotoUrl(null)}
+        />
+      )}
+      {(!photoUrl || !loaded) && (
+        <span style={{
+          position:'absolute',inset:0,
+          display:'flex',alignItems:'center',justifyContent:'center',
+          color:'white',fontWeight:700,fontSize:14
+        }}>{initials}</span>
+      )}
+    </div>
   )
 }
 
