@@ -33,10 +33,17 @@ const POSITION_COORDS = {
   'ailier gauche':                  { x: 18, y: 28 },
   'remplacement':                   null,
   'entraineur':                     null,
+  'assistant entraineur':           null,
+  'lateral droit':                  { x: 82, y: 75 },
+  'lateral gauche':                 { x: 18, y: 75 },
+  'defenseur central':              { x: 50, y: 76 },
+  'milieu central':                 { x: 50, y: 50 },
+  'avant-centre':                   { x: 50, y: 18 },
+  'avant centre':                   { x: 50, y: 18 },
 }
 
 // Positions that should NEVER match as goalkeeper
-const NOT_GK = ['demi', 'milieu', 'defense', 'attaque', 'attaquant', 'ailier', 'libero', 'stopper', 'remplacement', 'entraineur']
+const NOT_GK = ['demi', 'milieu', 'defense', 'defenseur', 'attaque', 'attaquant', 'ailier', 'libero', 'stopper', 'lateral', 'remplacement', 'entraineur']
 
 function norm(str) {
   return (str || '')
@@ -53,7 +60,7 @@ function getCoords(position) {
   const n = norm(position)
   
   // Skip null positions
-  if (['remplacement', 'entraineur', 'coach'].some(s => n === s || n.startsWith(s + ' '))) return null
+  if (['remplacement', 'entraineur', 'coach', 'assistant entraineur'].some(s => n === s || n.startsWith(s + ' '))) return null
 
   // Try exact match first
   if (POSITION_COORDS[n] !== undefined) return POSITION_COORDS[n]

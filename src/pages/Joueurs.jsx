@@ -141,10 +141,14 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
           isAdmin={isAdmin}
           onClose={() => setSelected(null)}
           onUpdate={async () => {
-            await fetchData()
-            // refresh selected with latest data
+            const { data: pData } = await supabase.from('players').select('*').order('last_name')
+            const { data: tData } = await supabase.from('fitness_tests').select('*')
+            setPlayers(pData || [])
+            setTests(tData || [])
+            // update selected with fresh data
             setSelected(prev => {
-              const updated = players.find(p => p.id === prev?.id)
+              if (!prev) return null
+              const updated = (pData || []).find(p => p.id === prev.id)
               return updated || prev
             })
           }}
