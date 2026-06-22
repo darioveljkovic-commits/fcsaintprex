@@ -133,18 +133,101 @@ export default function App() {
           <img src={LOGO} alt="logo" onError={e => e.target.style.display='none'} />
           <h2>FC St-Prex Seniors</h2>
         </div>
-        <div className="topbar-right">
-          <div style={{display:'flex',alignItems:'center',gap:6}}>
-          <button style={{background:'rgba(255,255,255,0.15)',border:'none',color:'white',padding:'5px 10px',borderRadius:6,fontSize:12,cursor:'pointer'}}
-            onClick={() => setShowChangePw(true)}>
-            🔒 PW
+        <div className="topbar-right" style={{position:'relative'}}>
+          {/* Profile avatar button */}
+          <button
+            onClick={() => setShowProfileMenu(v => !v)}
+            style={{
+              background:'none',border:'2.5px solid rgba(255,255,255,0.6)',
+              borderRadius:'50%',padding:0,cursor:'pointer',
+              width:38,height:38,overflow:'hidden',flexShrink:0,
+              display:'flex',alignItems:'center',justifyContent:'center'
+            }}
+            title={displayName}
+          >
+            {currentPlayer?.photo_url ? (
+              <img
+                src={currentPlayer.photo_url}
+                alt={displayName}
+                style={{width:'100%',height:'100%',objectFit:'cover'}}
+                onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='flex' }}
+              />
+            ) : null}
+            <span style={{
+              display: currentPlayer?.photo_url ? 'none' : 'flex',
+              alignItems:'center',justifyContent:'center',
+              width:'100%',height:'100%',
+              background:'rgba(255,255,255,0.2)',
+              color:'white',fontWeight:700,fontSize:15,letterSpacing:0
+            }}>
+              {currentPlayer
+                ? `${currentPlayer.first_name?.[0] ?? ''}${currentPlayer.last_name?.[0] ?? ''}`
+                : 'FC'}
+            </span>
           </button>
-          <button style={{background:'none',border:'1.5px solid rgba(255,255,255,0.4)',color:'white',padding:'5px 10px',borderRadius:6,fontSize:12,cursor:'pointer'}}
-            onClick={handleLogout}>
-            Déconnexion
-          </button>
-        </div>
-    
+
+          {/* Dropdown menu */}
+          {showProfileMenu && (
+            <>
+              {/* Backdrop to close on outside click */}
+              <div
+                style={{position:'fixed',inset:0,zIndex:198}}
+                onClick={() => setShowProfileMenu(false)}
+              />
+              <div style={{
+                position:'absolute',top:46,right:0,
+                background:'white',borderRadius:12,
+                boxShadow:'0 8px 32px rgba(0,0,0,0.22)',
+                minWidth:200,zIndex:199,overflow:'hidden'
+              }}>
+                {/* User info header */}
+                <div style={{
+                  padding:'14px 16px 10px',
+                  borderBottom:'1px solid #f0f0f0'
+                }}>
+                  <div style={{fontWeight:700,fontSize:14,color:'var(--red)',lineHeight:1.2}}>
+                    {displayName}
+                  </div>
+                  {isAdmin && (
+                    <div style={{fontSize:11,color:'#999',marginTop:2}}>Admin</div>
+                  )}
+                </div>
+
+                {/* Change PW */}
+                <button
+                  onClick={() => { setShowProfileMenu(false); setShowChangePw(true) }}
+                  style={{
+                    width:'100%',background:'none',border:'none',
+                    textAlign:'left',padding:'12px 16px',
+                    fontSize:13,color:'#333',cursor:'pointer',
+                    display:'flex',alignItems:'center',gap:10
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background='#f9f9f9'}
+                  onMouseLeave={e => e.currentTarget.style.background='none'}
+                >
+                  <span style={{fontSize:16}}>🔒</span> Changer mon mot de passe
+                </button>
+
+                {/* Divider */}
+                <div style={{height:1,background:'#f0f0f0'}} />
+
+                {/* Logout */}
+                <button
+                  onClick={() => { setShowProfileMenu(false); handleLogout() }}
+                  style={{
+                    width:'100%',background:'none',border:'none',
+                    textAlign:'left',padding:'12px 16px',
+                    fontSize:13,color:'var(--red)',cursor:'pointer',
+                    display:'flex',alignItems:'center',gap:10
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background='#fdecea'}
+                  onMouseLeave={e => e.currentTarget.style.background='none'}
+                >
+                  <span style={{fontSize:16}}>🚪</span> Déconnexion
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
