@@ -77,18 +77,16 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
   return (
     <>
       <div className="search-wrap">
-        <input className="search-input" type="text" placeholder="Rechercher nom, poste, passion..." value={search} onChange={e => setSearch(e.target.value)} />
-        {search.trim() && (
-          <div style={{display:'flex',gap:6,marginTop:7,alignItems:'center'}}>
-            <span style={{fontSize:11,color:'var(--gray-4)'}}>Chercher dans :</span>
-            <button onClick={() => setSearchScope('all')} style={{fontSize:11,padding:'2px 10px',borderRadius:20,border:'1.5px solid',cursor:'pointer',borderColor:searchScope==='all'?'var(--red)':'var(--gray-3)',background:searchScope==='all'?'var(--red)':'white',color:searchScope==='all'?'white':'var(--gray-4)'}}>
-              Tous
-            </button>
-            <button onClick={() => setSearchScope('group')} style={{fontSize:11,padding:'2px 10px',borderRadius:20,border:'1.5px solid',cursor:'pointer',borderColor:searchScope==='group'?'var(--red)':'var(--gray-3)',background:searchScope==='group'?'var(--red)':'white',color:searchScope==='group'?'white':'var(--gray-4)'}}>
-              {scopeGroup ? `Seniors ${scopeGroup}` : 'Mon groupe'}
-            </button>
-          </div>
-        )}
+        <input className="search-input" type="text" placeholder="Rechercher nom, poste, passion..." value={search} onChange={e => setSearch(e.target.value)} autoComplete="off" />
+        <div style={{display:'flex',gap:6,marginTop:7,alignItems:'center'}}>
+          <span style={{fontSize:11,color:'var(--gray-4)'}}>Chercher dans :</span>
+          <button onClick={() => setSearchScope('all')} style={{fontSize:11,padding:'2px 10px',borderRadius:20,border:'1.5px solid',cursor:'pointer',borderColor:searchScope==='all'?'var(--red)':'var(--gray-3)',background:searchScope==='all'?'var(--red)':'white',color:searchScope==='all'?'white':'var(--gray-4)'}}>
+            Tous
+          </button>
+          <button onClick={() => setSearchScope('group')} style={{fontSize:11,padding:'2px 10px',borderRadius:20,border:'1.5px solid',cursor:'pointer',borderColor:searchScope==='group'?'var(--red)':'var(--gray-3)',background:searchScope==='group'?'var(--red)':'white',color:searchScope==='group'?'white':'var(--gray-4)'}}>
+            {scopeGroup ? `Seniors ${scopeGroup}` : 'Mon groupe'}
+          </button>
+        </div>
       </div>
 
       <div className="content">
