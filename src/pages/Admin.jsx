@@ -77,7 +77,6 @@ export default function Admin() {
   const handleInvite = () => {
     if (!invitePlayer || !inviteEmail) return
     const p = players.find(x => x.id === invitePlayer)
-    const p = players.find(x => x.id === invitePlayer)
     const sql = `-- Joueur: ${p?.first_name} ${p?.last_name} — Email: ${inviteEmail}
 --
 -- ÉTAPES:
