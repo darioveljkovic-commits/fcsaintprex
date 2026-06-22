@@ -6,6 +6,8 @@ import Fitness from './pages/Fitness'
 import Anniversaires from './pages/Anniversaires'
 import Admin from './pages/Admin'
 import Postes from './pages/Postes'
+import Consent from './pages/Consent'
+import Privacy from './pages/Privacy'
 import './App.css'
 
 const LOGO = 'https://fcsaintprex.ch/wp-content/uploads/2021/09/cropped-logo_fc_saint_prex.jpg'
@@ -21,6 +23,7 @@ export default function App() {
   const [pwMsg, setPwMsg] = useState('')
   const [pwLoading, setPwLoading] = useState(false)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
+  const [showPrivacy, setShowPrivacy] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -73,6 +76,13 @@ export default function App() {
 
   if (loading) return <div className="loading" style={{ minHeight: '100vh' }}>Chargement...</div>
   if (!session) return <Login />
+
+  // Show consent screen if player hasn't accepted yet
+  if (currentPlayer && currentPlayer.consent_given === false) {
+    return <Consent currentPlayer={currentPlayer} onAccept={() => {
+      setCurrentPlayer(prev => ({...prev, consent_given: true}))
+    }} />
+  }
 
 
 
@@ -132,6 +142,14 @@ export default function App() {
       {activeTab === 'anniversaires' && <Anniversaires />}
       {activeTab === 'postes' && <Postes currentPlayer={currentPlayer} isAdmin={isAdmin} />}
       {activeTab === 'admin' && isAdmin && <Admin />}
+      <div style={{textAlign:'center',padding:'12px 0 4px',fontSize:11,color:'rgba(255,255,255,0.0)'}}>
+        <span style={{color:'var(--gray-4)',cursor:'pointer'}} onClick={() => setShowPrivacy(true)}>
+          Politique de confidentialité
+        </span>
+      </div>
+
+      {showPrivacy && <Privacy onClose={() => setShowPrivacy(false)} />}
+
       {showChangePw && (
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:500,display:'flex',alignItems:'center',justifyContent:'center'}}>
           <div style={{background:'white',borderRadius:14,padding:'28px 24px',width:320,maxWidth:'90vw',boxShadow:'0 20px 60px rgba(0,0,0,0.3)'}}>
