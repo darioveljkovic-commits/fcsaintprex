@@ -18,17 +18,24 @@ const SUPABASE_STORAGE = 'https://lymeedgkdurumfdpmitl.supabase.co/storage/v1/ob
 function AvatarImg({ player, displayName }) {
   const [err, setErr] = React.useState(false)
 
-  // Initialen-Fallback
   const initials = player
     ? `${player.first_name?.[0] ?? ''}${player.last_name?.[0] ?? ''}`
     : 'FC'
 
-  // URL aus DB nehmen, Cache-Buster entfernen für saubereren Load
-  const rawUrl = player?.photo_url
-    ? player.photo_url.split('?')[0]
-    : null
+  // Baut den URL robust auf:
+  // 1. Falls photo_url ein voller https-URL ist → direkt verwenden (ohne Cache-Buster)
+  // 2. Falls nur Dateiname → Storage-Basis voranstellen
+  // 3. Falls null/leer → Initialen zeigen
+  const buildUrl = (raw) => {
+    if (!raw) return null
+    const clean = raw.split('?')[0]
+    if (clean.startsWith('http')) return clean
+    return SUPABASE_STORAGE + '/' + clean.replace(/^\//, '')
+  }
 
-  if (!rawUrl || err) {
+  const photoUrl = buildUrl(player?.photo_url)
+
+  if (!photoUrl || err) {
     return (
       <span style={{
         display:'flex',alignItems:'center',justifyContent:'center',
@@ -43,9 +50,9 @@ function AvatarImg({ player, displayName }) {
 
   return (
     <img
-      src={rawUrl}
+      src={photoUrl}
       alt={displayName}
-      style={{width:'100%',height:'100%',objectFit:'cover'}}
+      style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}
       onError={() => setErr(true)}
     />
   )
