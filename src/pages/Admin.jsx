@@ -77,16 +77,21 @@ export default function Admin() {
   const handleInvite = () => {
     if (!invitePlayer || !inviteEmail) return
     const p = players.find(x => x.id === invitePlayer)
-    const sql = `-- 1. Dans Supabase → Authentication → Users → "Invite User" avec: ${inviteEmail}
--- 2. Récupère l'UUID du nouvel utilisateur dans Authentication → Users
--- 3. Remplace USER_UUID_ICI par cet UUID et exécute ce SQL:
+    const p = players.find(x => x.id === invitePlayer)
+    const sql = `-- Joueur: ${p?.first_name} ${p?.last_name} — Email: ${inviteEmail}
+--
+-- ÉTAPES:
+-- 1. Supabase → Authentication → Users → "Add user" → email: ${inviteEmail} + mot de passe temporaire
+-- 2. Clique sur le nouvel utilisateur → copie son UUID
+-- 3. Remplace COLLER_UUID_ICI par l'UUID copié
+-- 4. Exécute ce SQL
 
 INSERT INTO user_roles (user_id, role, player_id)
-VALUES ('USER_UUID_ICI', 'player', '${invitePlayer}')
+VALUES ('COLLER_UUID_ICI', 'player', '${invitePlayer}')
 ON CONFLICT (user_id) DO UPDATE SET role = 'player', player_id = '${invitePlayer}';
 
 UPDATE players SET 
-  user_id = 'USER_UUID_ICI',
+  user_id = 'COLLER_UUID_ICI',
   pw_changed = false,
   consent_given = false
 WHERE id = '${invitePlayer}';

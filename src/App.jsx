@@ -76,8 +76,14 @@ export default function App() {
     if (error) {
       setPwMsg('Erreur: ' + error.message)
     } else {
+      // Mark pw as changed in DB and state
+      if (currentPlayer?.id) {
+        await supabase.from('players').update({ pw_changed: true }).eq('id', currentPlayer.id)
+        setCurrentPlayer(prev => prev ? {...prev, pw_changed: true} : prev)
+      }
       setPwMsg('Mot de passe mis à jour!')
-      setTimeout(() => { setShowChangePw(false); setNewPw(''); setPwMsg('') }, 1500)
+      setNewPw('')
+      setTimeout(() => { setPwMsg(''); setShowChangePw(false) }, 1500)
     }
   }
 
@@ -85,7 +91,7 @@ export default function App() {
   if (!session) return <Login />
 
   // Step 1: Force PW change on first login
-  if (forcePwChange || (currentPlayer && currentPlayer.pw_changed === false)) {
+  if (currentPlayer && currentPlayer.pw_changed === false) {
     return (
       <div style={{minHeight:'100vh',background:'linear-gradient(160deg,#8b0f12,#c0161a)',display:'flex',alignItems:'center',justifyContent:'center',padding:20}}>
         <div style={{background:'white',borderRadius:18,padding:'28px 24px',width:360,maxWidth:'100%',boxShadow:'0 24px 64px rgba(0,0,0,0.4)'}}>
