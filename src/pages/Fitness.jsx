@@ -136,16 +136,15 @@ export default function Fitness({ currentPlayer, isAdmin }) {
       )}
     </div>
 
-      {selected && (
-        <PlayerModal
-          player={selected}
-          tests={tests.filter(t => t.player_id === selected.id)}
-          isOwn={currentPlayer?.id === selected.id}
-          isAdmin={isAdmin}
-          onClose={() => setSelected(null)}
-          onUpdate={() => {}}
-        />
-      )}
-    </div>
+    {selected && (
+      <PlayerModal
+        player={selected}
+        tests={tests.filter(t => t.player_id === selected.id)}
+        isOwn={currentPlayer?.id === selected.id}
+        isAdmin={isAdmin}
+        onClose={() => setSelected(null)}
+        onUpdate={() => {}}
+      />
+    )}
   )
 }
