@@ -52,6 +52,7 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
     ? players.filter(p => {
         const q = normStr(search)
         if (!inGroup(p)) return false
+        if (p.status === 'sorti') return false
         return normStr(p.first_name + ' ' + p.last_name).includes(q) ||
           normStr(p.position).includes(q) ||
           normStr(p.preferred_position).includes(q) ||
@@ -60,8 +61,8 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
           p.group_name.includes(search)
       })
     : [
-        ...sortPlayers(players.filter(p => inGroup(p) && p.active !== false)),
-        ...players.filter(p => inGroup(p) && p.active === false)
+        ...sortPlayers(players.filter(p => inGroup(p) && p.status === 'actif')),
+        ...players.filter(p => inGroup(p) && p.status === 'pause')
           .sort((a,b) => (a.born||'9999').localeCompare(b.born||'9999'))
       ]
 
@@ -98,7 +99,7 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
           ? <div className="no-results">Aucun joueur trouvé</div>
           : <div className="player-grid">
               {filtered.map(p => (
-                <div key={p.id} className={`player-card${!p.active ? ' player-inactive' : ''}`} onClick={() => setSelected(p)}>
+                <div key={p.id} className={`player-card${p.status === 'pause' ? ' player-inactive' : ''}`} onClick={() => setSelected(p)}>
                   <div className="player-card-top">
                     {p.born && <span className="player-age">{getAge(p.born)}</span>}
                   </div>

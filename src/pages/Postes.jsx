@@ -131,7 +131,7 @@ export default function Postes({ currentPlayer, isAdmin }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase.from('players').select('*').eq('active', true).then(({ data }) => {
+    supabase.from('players').select('*').eq('status', 'actif').then(({ data }) => {
       setPlayers(data || [])
       setLoading(false)
     })

@@ -12,7 +12,7 @@ export default function Fitness({ currentPlayer, isAdmin }) {
 
   useEffect(() => {
     const fetch = async () => {
-      const { data: p } = await supabase.from('players').select('*').eq('active', true)
+      const { data: p } = await supabase.from('players').select('*').in('status', ['actif', 'pause'])
       const { data: t } = await supabase.from('fitness_tests').select('*')
       setPlayers(p || [])
       setTests(t || [])

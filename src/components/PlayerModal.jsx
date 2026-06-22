@@ -10,7 +10,7 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
     preferred_position: player.preferred_position || '',
     position: player.position || '',
     city: player.city || '',
-    active: player.active !== false,
+    status: player.status || 'actif',
     group_name: player.group_name || '+40',
   })
 
@@ -22,7 +22,7 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
       passions: player.passions || '',
       preferred_position: player.preferred_position || '',
       position: player.position || '',
-      active: player.active !== false,
+      status: player.status || 'actif',
       group_name: player.group_name || '+40',
     })
   }, [player])
@@ -56,7 +56,7 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
       passions: form.passions || null,
       preferred_position: form.preferred_position || null,
       city: form.city || null,
-      active: form.active,
+      status: form.status,
       group_name: form.group_name,
     }
     if (isAdmin) updateData.position = form.position || null
@@ -229,10 +229,12 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
                   <option value="+40">Seniors +40</option>
                   <option value="+50">Seniors +50</option>
                 </select>
-                <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:10}}>
-                  <input type="checkbox" id="active-check" checked={form.active} onChange={e => setForm({...form, active: e.target.checked})} />
-                  <label htmlFor="active-check" style={{fontSize:13,cursor:'pointer'}}>Joueur actif</label>
-                </div>
+                <label className="form-label">Statut</label>
+                <select className="edit-field" value={form.status} onChange={e => setForm({...form, status: e.target.value})}>
+                  <option value="actif">Actif — joue régulièrement</option>
+                  <option value="pause">En pause — blessé ou pause temporaire</option>
+                  <option value="sorti">Sorti du club</option>
+                </select>
               </>}
               </div>}
 

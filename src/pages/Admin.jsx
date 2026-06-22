@@ -24,7 +24,7 @@ export default function Admin() {
   const [inviteError, setInviteError] = useState('')
 
   useEffect(() => {
-    supabase.from('players').select('*').eq('active', true).order('last_name').then(({ data }) => setPlayers(data || []))
+    supabase.from('players').select('*').neq('status', 'sorti').order('last_name').then(({ data }) => setPlayers(data || []))
   }, [])
 
   const handleValueChange = (v) => {
