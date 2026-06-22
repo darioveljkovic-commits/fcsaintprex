@@ -49,7 +49,9 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
 
   const normStr = s => { if (!s) return ''; var r = s.toLowerCase().normalize('NFD'); var out = ''; for (var i=0; i<r.length; i++) { var c = r.charCodeAt(i); if (c < 0x300 || c > 0x36f) out += r[i]; } return out.replace(/[^a-z0-9 ]/g, '').trim(); }
   const inGroup = p => activeGroup === 'all' || p.group_name === activeGroup
-  const inSearchScope = p => searchScope === 'all' || p.group_name === activeGroup
+  const playerGroup = currentPlayer?.group_name
+  const scopeGroup = activeGroup !== 'all' ? activeGroup : playerGroup
+  const inSearchScope = p => searchScope === 'all' || p.group_name === scopeGroup
   const filtered = search.trim()
     ? players.filter(p => {
         const q = normStr(search)
