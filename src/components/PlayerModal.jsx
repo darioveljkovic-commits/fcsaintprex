@@ -12,12 +12,14 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
     city: player.city || '',
     status: player.status || 'actif',
     group_name: player.group_name || '+40',
+    born: player.born || '',
   })
 
   // Sync form when player prop updates after save
   useEffect(() => {
     setForm({
       job: player.job || '',
+      born: player.born || '',
       tel: player.tel || '',
       passions: player.passions || '',
       preferred_position: player.preferred_position || '',
@@ -58,6 +60,7 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
       city: form.city || null,
       status: form.status,
       group_name: form.group_name,
+      born: form.born || null,
     }
     if (isAdmin) updateData.position = form.position || null
     const { error } = await supabase.from('players').update(updateData).eq('id', player.id)
@@ -204,6 +207,8 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
               <input className="edit-field" value={form.passions} onChange={e => setForm({ ...form, passions: e.target.value })} placeholder="Tennis, cuisine, voyages..." />
               <label className="form-label">Ville</label>
               <input className="edit-field" value={form.city || ''} onChange={e => setForm({ ...form, city: e.target.value })} placeholder="Saint-Prex, Morges..." />
+              <label className="form-label" style={{marginTop:8}}>Date de naissance</label>
+              <input className="edit-field" type="date" value={form.born || ''} onChange={e => setForm({ ...form, born: e.target.value })} />
 
               <div style={{background:'var(--gray-1)',borderRadius:8,padding:'10px 12px',marginBottom:12}}>
                 <div style={{fontSize:11,fontWeight:700,color:'var(--gray-4)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:8}}>Mes informations</div>

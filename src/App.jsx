@@ -13,7 +13,8 @@ import './App.css'
 const LOGO = 'https://fcsaintprex.ch/wp-content/uploads/2021/09/cropped-logo_fc_saint_prex.jpg'
 
 
-const SUPABASE_STORAGE = 'https://lymeedgkdurumfdpmitl.supabase.co/storage/v1/object/public/player-photos'
+const SUPABASE_URL = 'https://lymeedgkdurumfdpmitl.supabase.co'
+const SUPABASE_STORAGE = SUPABASE_URL + '/storage/v1/object/public/player-photos'
 
 function AvatarImg({ player, displayName }) {
   const [err, setErr] = React.useState(false)
@@ -95,11 +96,14 @@ export default function App() {
     const { data: roleData } = await supabase.from('user_roles').select('*, players(*)').eq('user_id', user.id).single()
     if (roleData) {
       setIsAdmin(roleData.role === 'admin')
-      // Player direkt laden um sicherzustellen dass alle Felder inkl. photo_url vorhanden sind
       let player = roleData.players || null
-      if (player?.id) {
-        const { data: fullPlayer } = await supabase.from('players').select('*').eq('id', player.id).single()
-        if (fullPlayer) player = fullPlayer
+      // Falls photo_url im JOIN fehlt: aus Storage-Name konstruieren
+      if (player && !player.photo_url && player.last_name && player.first_name) {
+        const key = (player.last_name + '_' + player.first_name)
+          .toLowerCase()
+          .normalize('NFD').replace(/[̀-ͯ]/g, '')
+          .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')
+        player = { ...player, photo_url: SUPABASE_URL + '/storage/v1/object/public/player-photos/' + key + '.jpg' }
       }
       setCurrentPlayer(player)
       if (player && activeGroup === null) setActiveGroup(player.group_name || 'all')
