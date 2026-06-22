@@ -22,39 +22,37 @@ function AvatarImg({ player, displayName }) {
     ? `${player.first_name?.[0] ?? ''}${player.last_name?.[0] ?? ''}`
     : 'FC'
 
-  // Baut den URL robust auf:
-  // 1. Falls photo_url ein voller https-URL ist → direkt verwenden (ohne Cache-Buster)
-  // 2. Falls nur Dateiname → Storage-Basis voranstellen
-  // 3. Falls null/leer → Initialen zeigen
   const buildUrl = (raw) => {
     if (!raw) return null
     const clean = raw.split('?')[0]
     if (clean.startsWith('http')) return clean
-    return SUPABASE_STORAGE + '/' + clean.replace(/^\//, '')
+    return SUPABASE_STORAGE + '/' + clean.replace(/^[/]/, '')
   }
 
   const photoUrl = buildUrl(player?.photo_url)
-
-  if (!photoUrl || err) {
-    return (
-      <span style={{
-        display:'flex',alignItems:'center',justifyContent:'center',
-        width:'100%',height:'100%',
-        background:'rgba(255,255,255,0.25)',
-        color:'white',fontWeight:700,fontSize:15
-      }}>
-        {initials}
-      </span>
-    )
-  }
+  const showPhoto = photoUrl && !err
 
   return (
-    <img
-      src={photoUrl}
-      alt={displayName}
-      style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}
-      onError={() => setErr(true)}
-    />
+    <div style={{width:'100%',height:'100%',position:'relative',borderRadius:'50%',overflow:'hidden'}}>
+      {showPhoto && (
+        <img
+          src={photoUrl}
+          alt={displayName}
+          style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}
+          onError={() => setErr(true)}
+        />
+      )}
+      {!showPhoto && (
+        <div style={{
+          width:'100%',height:'100%',
+          display:'flex',alignItems:'center',justifyContent:'center',
+          background:'rgba(255,255,255,0.25)',
+          color:'white',fontWeight:700,fontSize:15
+        }}>
+          {initials}
+        </div>
+      )}
+    </div>
   )
 }
 
