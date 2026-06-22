@@ -8,10 +8,13 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
     tel: player.tel || '',
     passions: player.passions || '',
     preferred_position: player.preferred_position || '',
+    active: player.active !== false,
+    group_name: player.group_name || '+40',
   })
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState('')
   const [uploading, setUploading] = useState(false)
+  const [lightbox, setLightbox] = useState(false)
 
   const initials = `${player.first_name?.[0] || ''}${player.last_name?.[0] || ''}`.toUpperCase()
   const fullName = `${player.first_name} ${player.last_name}`
@@ -26,6 +29,8 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
       tel: form.tel || null,
       passions: form.passions || null,
       preferred_position: form.preferred_position || null,
+      active: form.active,
+      group_name: form.group_name,
     }).eq('id', player.id)
     setSaving(false)
     if (!error) {
@@ -75,7 +80,7 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
   const lastCooper = cooperTests[cooperTests.length - 1]
   const lastSprint = sprintTests[sprintTests.length - 1]
 
-  return (
+  const modal = (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal">
         <div className="modal-header">
@@ -85,7 +90,7 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
         <div className="modal-body">
           <div className="profile-header">
             {player.photo_url
-              ? <img src={player.photo_url} className="profile-photo-lg" alt={fullName} />
+              ? <img src={player.photo_url} className="profile-photo-lg" alt={fullName} style={{cursor:'pointer'}} onClick={() => setLightbox(true)} />
               : <div className="profile-avatar-lg">{initials}</div>
             }
             <div className="profile-info">
@@ -162,6 +167,18 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
               <label className="form-label">Préférence de poste sur le terrain</label>
               <input className="edit-field" value={form.preferred_position} onChange={e => setForm({ ...form, preferred_position: e.target.value })} placeholder="Milieu défensif, ailier droit..." />
 
+              <label className="form-label">Catégorie d'âge</label>
+              <select className="edit-field" value={form.group_name} onChange={e => setForm({ ...form, group_name: e.target.value })}>
+                <option value="+30">Seniors +30</option>
+                <option value="+40">Seniors +40</option>
+                <option value="+50">Seniors +50</option>
+              </select>
+
+              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:10}}>
+                <input type="checkbox" id="active-check" checked={form.active} onChange={e => setForm({...form, active: e.target.checked})} />
+                <label htmlFor="active-check" style={{fontSize:13,cursor:'pointer'}}>Joueur actif</label>
+              </div>
+
               {success && <div className="success-msg">{success}</div>}
               <button className="btn-red" onClick={handleSave} disabled={saving}>
                 {saving ? 'Enregistrement...' : 'Enregistrer'}
@@ -171,5 +188,17 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
         </div>
       </div>
     </div>
+  )
+
+  return (
+    <>
+      {modal}
+      {lightbox && player.photo_url && (
+        <div onClick={() => setLightbox(false)} style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.85)',zIndex:300,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer'}}>
+          <img src={player.photo_url} alt={fullName} style={{maxWidth:'90vw',maxHeight:'90vh',borderRadius:12,objectFit:'contain'}} />
+          <div style={{position:'absolute',top:16,right:16,color:'white',fontSize:28,cursor:'pointer'}}>×</div>
+        </div>
+      )}
+    </>
   )
 }
