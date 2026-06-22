@@ -16,11 +16,27 @@ const LOGO = 'https://fcsaintprex.ch/wp-content/uploads/2021/09/cropped-logo_fc_
 const SUPABASE_STORAGE = 'https://lymeedgkdurumfdpmitl.supabase.co/storage/v1/object/public/player-photos'
 
 function AvatarImg({ player, displayName }) {
+  const [err, setErr] = React.useState(false)
+
   const initials = player
     ? `${player.first_name?.[0] ?? ''}${player.last_name?.[0] ?? ''}`
     : 'FC'
 
-  if (!player?.photo_url) {
+  // URL aus DB oder direkt aus Name konstruieren (Fallback)
+  const getUrl = () => {
+    if (player?.photo_url) return player.photo_url.split('?')[0]
+    if (player?.last_name && player?.first_name) {
+      const key = `${player.last_name}_${player.first_name}`.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')
+      return `${SUPABASE_STORAGE}/${key}.jpg`
+    }
+    return null
+  }
+
+  const url = getUrl()
+
+  if (!url || err) {
     return (
       <div style={{
         width:'100%',height:'100%',
@@ -33,14 +49,10 @@ function AvatarImg({ player, displayName }) {
 
   return (
     <img
-      src={player.photo_url}
+      src={url}
       alt={displayName}
-      className="player-photo"
-      style={{width:'38px',height:'38px',margin:0}}
-      onError={e => {
-        e.target.style.display = 'none'
-        e.target.parentNode.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.25);color:white;font-weight:700;font-size:15px">${initials}</div>`
-      }}
+      style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:'50%'}}
+      onError={() => setErr(true)}
     />
   )
 }
