@@ -38,31 +38,6 @@ function AvatarImg({ player, displayName }) {
     />
   )
 }
-    return null
-  }
-
-  const url = getUrl()
-
-  if (!url || err) {
-    return (
-      <div style={{
-        width:'100%',height:'100%',
-        display:'flex',alignItems:'center',justifyContent:'center',
-        background:'rgba(255,255,255,0.25)',
-        color:'white',fontWeight:700,fontSize:15
-      }}>{initials}</div>
-    )
-  }
-
-  return (
-    <img
-      src={url}
-      alt={displayName}
-      style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:'50%'}}
-      onError={() => setErr(true)}
-    />
-  )
-}
 
 export default function App() {
   const [session, setSession] = useState(null)
