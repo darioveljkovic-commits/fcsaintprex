@@ -24,6 +24,7 @@ export default function App() {
   const [pwLoading, setPwLoading] = useState(false)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [showPrivacy, setShowPrivacy] = useState(false)
+  const [forcePwChange, setForcePwChange] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -48,7 +49,12 @@ export default function App() {
     const { data: roleData } = await supabase.from('user_roles').select('*, players(*)').eq('user_id', user.id).single()
     if (roleData) {
       setIsAdmin(roleData.role === 'admin')
-      setCurrentPlayer(roleData.players || null)
+      const player = roleData.players || null
+      setCurrentPlayer(player)
+      // Force PW change if player hasn't set their own password yet
+      if (player && player.pw_changed === false) {
+        setForcePwChange(true)
+      }
     }
     setLoading(false)
   }
@@ -78,7 +84,30 @@ export default function App() {
   if (loading) return <div className="loading" style={{ minHeight: '100vh' }}>Chargement...</div>
   if (!session) return <Login />
 
-  // Show consent screen if player hasn't accepted yet
+  // Step 1: Force PW change on first login
+  if (forcePwChange || (currentPlayer && currentPlayer.pw_changed === false)) {
+    return (
+      <div style={{minHeight:'100vh',background:'linear-gradient(160deg,#8b0f12,#c0161a)',display:'flex',alignItems:'center',justifyContent:'center',padding:20}}>
+        <div style={{background:'white',borderRadius:18,padding:'28px 24px',width:360,maxWidth:'100%',boxShadow:'0 24px 64px rgba(0,0,0,0.4)'}}>
+          <div style={{textAlign:'center',marginBottom:20}}>
+            <div style={{fontSize:32,marginBottom:8}}>🔒</div>
+            <h2 style={{fontSize:18,fontWeight:700,color:'var(--red)',marginBottom:6}}>Choisissez votre mot de passe</h2>
+            <p style={{fontSize:13,color:'var(--gray-4)',lineHeight:1.5}}>Pour sécuriser ton compte, tu dois définir ton propre mot de passe avant de continuer.</p>
+          </div>
+          <form onSubmit={handleChangePw}>
+            <label className="form-label">Nouveau mot de passe</label>
+            <input className="form-input" type="password" placeholder="Min. 8 caractères dont 1 chiffre" value={newPw} onChange={e => setNewPw(e.target.value)} autoComplete="new-password" required style={{marginBottom:12}} />
+            {pwMsg && <p style={{fontSize:13,color:pwMsg.includes('jour')?'var(--green)':'var(--red)',marginBottom:8}}>{pwMsg}</p>}
+            <button className="btn-primary" type="submit" disabled={pwLoading}>
+              {pwLoading ? 'Enregistrement...' : 'Confirmer et continuer'}
+            </button>
+          </form>
+        </div>
+      </div>
+    )
+  }
+
+  // Step 2: Show consent screen if player hasn't accepted yet
   if (currentPlayer && currentPlayer.consent_given === false) {
     return <Consent currentPlayer={currentPlayer} onAccept={() => {
       setCurrentPlayer(prev => ({...prev, consent_given: true}))
