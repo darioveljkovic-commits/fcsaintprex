@@ -12,10 +12,28 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
     active: player.active !== false,
     group_name: player.group_name || '+40',
   })
+
+  // Sync form when player prop updates after save
+  useEffect(() => {
+    setForm({
+      job: player.job || '',
+      tel: player.tel || '',
+      passions: player.passions || '',
+      preferred_position: player.preferred_position || '',
+      position: player.position || '',
+      active: player.active !== false,
+      group_name: player.group_name || '+40',
+    })
+  }, [player])
+  const [positions, setPositions] = useState([])
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState('')
   const [uploading, setUploading] = useState(false)
   const [lightbox, setLightbox] = useState(false)
+
+  useEffect(() => {
+    supabase.from('positions').select('*').order('sort_order').then(({ data }) => setPositions(data || []))
+  }, [])
 
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose() }
@@ -57,15 +75,39 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
     const file = e.target.files[0]
     if (!file) return
     setUploading(true)
-    const ext = file.name.split('.').pop()
-    const path = `${player.id}.${ext}`
-    const { error: upErr } = await supabase.storage.from('player-photos').upload(path, file, { upsert: true })
-    if (!upErr) {
-      const { data } = supabase.storage.from('player-photos').getPublicUrl(path)
-      await supabase.from('players').update({ photo_url: data.publicUrl }).eq('id', player.id)
-      onUpdate()
+    try {
+      // Compress image before upload
+      const compressed = await compressImage(file, 1200, 0.8)
+      const path = `${player.id}.jpg`
+      const { error: upErr } = await supabase.storage.from('player-photos').upload(path, compressed, { upsert: true, contentType: 'image/jpeg' })
+      if (!upErr) {
+        const { data } = supabase.storage.from('player-photos').getPublicUrl(path)
+        await supabase.from('players').update({ photo_url: data.publicUrl + '?t=' + Date.now() }).eq('id', player.id)
+        onUpdate()
+      }
+    } catch(err) {
+      console.error('Upload error:', err)
     }
     setUploading(false)
+  }
+
+  const compressImage = (file, maxWidth, quality) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const img = new Image()
+        img.onload = () => {
+          const canvas = document.createElement('canvas')
+          let w = img.width, h = img.height
+          if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth }
+          canvas.width = w; canvas.height = h
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+          canvas.toBlob(blob => resolve(blob), 'image/jpeg', quality)
+        }
+        img.src = e.target.result
+      }
+      reader.readAsDataURL(file)
+    })
   }
 
   const renderMiniChart = (testList, isCooper) => {
@@ -186,11 +228,17 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
 
               {isAdmin && <>
                 <label className="form-label">Poste (attribué par le coach)</label>
-                <input className="edit-field" value={form.position || ''} onChange={e => setForm({ ...form, position: e.target.value })} placeholder="Gardien, Libéro, Milieu..." />
+                <select className="edit-field" value={form.position || ''} onChange={e => setForm({ ...form, position: e.target.value })}>
+                  <option value="">— Sélectionner un poste —</option>
+                  {positions.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
+                </select>
               </>}
 
-              <label className="form-label">Préférence de poste sur le terrain</label>
-              <input className="edit-field" value={form.preferred_position} onChange={e => setForm({ ...form, preferred_position: e.target.value })} placeholder="Milieu défensif, ailier droit..." />
+              <label className="form-label">Préférence de poste</label>
+              <select className="edit-field" value={form.preferred_position || ''} onChange={e => setForm({ ...form, preferred_position: e.target.value })}>
+                <option value="">— Sélectionner une préférence —</option>
+                {positions.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
+              </select>
 
               {isAdmin && <>
                 <label className="form-label">Catégorie d'âge</label>

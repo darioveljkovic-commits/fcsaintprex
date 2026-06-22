@@ -90,7 +90,7 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
           <>
             <div className="group-tabs">
               {GROUPS.map(g => (
-                <div key={g} className={`group-tab${g === activeGroup ? ' active' : ''}`} onClick={() => setActiveGroup(g)}>{g}</div>
+                <div key={g} className={`group-tab${g === activeGroup ? ' active' : ''}`} onClick={() => { setActiveGroup(g); setSearchScope('group') }}>{g}</div>
               ))}
             </div>
             <div className="hero-banner">

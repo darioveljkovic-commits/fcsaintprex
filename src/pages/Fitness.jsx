@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { supabase, calcVO2, vo2Level, sprintLevel, GROUPS } from '../lib/supabase'
+import PlayerModal from '../components/PlayerModal'
 
 export default function Fitness({ currentPlayer, isAdmin }) {
   const [players, setPlayers] = useState([])
   const [tests, setTests] = useState([])
+  const [selected, setSelected] = useState(null)
   const [activeGroup, setActiveGroup] = useState(currentPlayer?.group_name || '+30')
   const [activeTest, setActiveTest] = useState('cooper')
   const [loading, setLoading] = useState(true)
@@ -131,6 +133,18 @@ export default function Fitness({ currentPlayer, isAdmin }) {
             </tbody>
           </table>
         </div>
+      )}
+    </div>
+
+      {selected && (
+        <PlayerModal
+          player={selected}
+          tests={tests.filter(t => t.player_id === selected.id)}
+          isOwn={currentPlayer?.id === selected.id}
+          isAdmin={isAdmin}
+          onClose={() => setSelected(null)}
+          onUpdate={() => {}}
+        />
       )}
     </div>
   )
