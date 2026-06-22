@@ -46,6 +46,7 @@ export default function Fitness({ currentPlayer, isAdmin }) {
   const ranked = getRanked()
 
   return (
+    <>
     <div className="content">
       <div className="group-tabs">
         {(isAdmin ? GROUPS : [currentPlayer?.group_name]).map(g => (
@@ -146,5 +147,6 @@ export default function Fitness({ currentPlayer, isAdmin }) {
         onUpdate={() => {}}
       />
     )}
+    </>
   )
 }
