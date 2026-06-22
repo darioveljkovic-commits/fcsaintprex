@@ -47,7 +47,7 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
     })
   }
 
-  cons  cons  cons  const normStr = s => { if (!s) return ''; var r = s.toLowerCase().normalize('NFD'); var out = ''; for (var i=0; i<r.length; i++) { var c = r.charCodeAt(i); if (c < 0x300 || c > 0x36f) out += r[i]; } return out.replace(/[^a-z0-9 ]/g, '').trim(); }
+  const normStr = s => { if (!s) return ''; var r = s.toLowerCase().normalize('NFD'); var out = ''; for (var i=0; i<r.length; i++) { var c = r.charCodeAt(i); if (c < 0x300 || c > 0x36f) out += r[i]; } return out.replace(/[^a-z0-9 ]/g, '').trim(); }
   const filtered = search.trim()
     ? players.filter(p => {
         const q = normStr(search)
