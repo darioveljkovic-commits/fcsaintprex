@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase, calcVO2, vo2Level, sprintLevel, getAge } from '../lib/supabase'
 
 export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, onUpdate }) {
@@ -8,6 +8,7 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
     tel: player.tel || '',
     passions: player.passions || '',
     preferred_position: player.preferred_position || '',
+    position: player.position || '',
     active: player.active !== false,
     group_name: player.group_name || '+40',
   })
@@ -15,6 +16,16 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
   const [success, setSuccess] = useState('')
   const [uploading, setUploading] = useState(false)
   const [lightbox, setLightbox] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [newPw, setNewPw] = useState('')
+  const [pwMsg, setPwMsg] = useState('')
+  const [pwLoading, setPwLoading] = useState(false)
+
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
 
   const initials = `${player.first_name?.[0] || ''}${player.last_name?.[0] || ''}`.toUpperCase()
   const fullName = `${player.first_name} ${player.last_name}`
@@ -22,16 +33,32 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
   const cooperTests = tests.filter(t => t.test_type === 'cooper').sort((a, b) => a.test_date.localeCompare(b.test_date))
   const sprintTests = tests.filter(t => t.test_type === 'sprint').sort((a, b) => a.test_date.localeCompare(b.test_date))
 
+  const handleChangePw = async () => {
+    if (newPw.length < 6) { setPwMsg('Minimum 6 caractères'); return }
+    setPwLoading(true)
+    const { error } = await supabase.auth.updateUser({ password: newPw })
+    setPwLoading(false)
+    if (error) {
+      setPwMsg('Erreur: ' + error.message)
+    } else {
+      setPwMsg('Mot de passe mis à jour!')
+      setNewPw('')
+      setTimeout(() => setPwMsg(''), 3000)
+    }
+  }
+
   const handleSave = async () => {
     setSaving(true)
-    const { error } = await supabase.from('players').update({
+    const updateData = {
       job: form.job || null,
       tel: form.tel || null,
       passions: form.passions || null,
       preferred_position: form.preferred_position || null,
       active: form.active,
       group_name: form.group_name,
-    }).eq('id', player.id)
+    }
+    if (isAdmin) updateData.position = form.position || null
+    const { error } = await supabase.from('players').update(updateData).eq('id', player.id)
     setSaving(false)
     if (!error) {
       setSuccess('Profil mis à jour!')
@@ -142,6 +169,14 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
           {/* EDIT SECTION - own profile only */}
           {(isOwn || isAdmin) && (
             <div className="edit-section">
+              <button
+                className="btn-red"
+                style={{width:'100%',marginBottom:12,background:editing?'var(--gray-5)':'var(--red)'}}
+                onClick={() => setEditing(!editing)}
+              >
+                {editing ? '✕ Fermer la modification' : '✏️ Modifier le profil'}
+              </button>
+              {editing && <div>
               <div className="card-title" style={{ marginBottom: 10 }}>✏️ Modifier le profil</div>
 
               {(isOwn || isAdmin) && (
@@ -164,6 +199,11 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
               <label className="form-label">Passions / Hobbies</label>
               <input className="edit-field" value={form.passions} onChange={e => setForm({ ...form, passions: e.target.value })} placeholder="Tennis, cuisine, voyages..." />
 
+              {isAdmin && <>
+                <label className="form-label">Poste (attribué par le coach)</label>
+                <input className="edit-field" value={form.position || ''} onChange={e => setForm({ ...form, position: e.target.value })} placeholder="Gardien, Libéro, Milieu..." />
+              </>}
+
               <label className="form-label">Préférence de poste sur le terrain</label>
               <input className="edit-field" value={form.preferred_position} onChange={e => setForm({ ...form, preferred_position: e.target.value })} placeholder="Milieu défensif, ailier droit..." />
 
@@ -183,6 +223,23 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
               <button className="btn-red" onClick={handleSave} disabled={saving}>
                 {saving ? 'Enregistrement...' : 'Enregistrer'}
               </button>
+
+              {isOwn && <div style={{marginTop:20,paddingTop:16,borderTop:'1.5px solid var(--gray-2)'}}>
+                <div className="card-title" style={{marginBottom:10,fontSize:13}}>🔒 Changer mon mot de passe</div>
+                <input
+                  className="edit-field"
+                  type="password"
+                  placeholder="Nouveau mot de passe (min. 6 caractères)"
+                  value={newPw}
+                  onChange={e => setNewPw(e.target.value)}
+                  autoComplete="new-password"
+                />
+                {pwMsg && <div style={{fontSize:12,marginBottom:8,color:pwMsg.includes('jour')?'var(--green)':'var(--red)'}}>{pwMsg}</div>}
+                <button className="btn-red" onClick={handleChangePw} disabled={pwLoading || newPw.length < 6} style={{background:'var(--gray-5)'}}>
+                  {pwLoading ? 'Enregistrement...' : 'Confirmer le nouveau mot de passe'}
+                </button>
+              </div>}
+              </div>}
             </div>
           )}
         </div>

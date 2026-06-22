@@ -20,6 +20,7 @@ export default function App() {
   const [newPw, setNewPw] = useState('')
   const [pwMsg, setPwMsg] = useState('')
   const [pwLoading, setPwLoading] = useState(false)
+  const [showProfileMenu, setShowProfileMenu] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -102,11 +103,27 @@ export default function App() {
           <h2>FC St-Prex Seniors</h2>
         </div>
         <div className="topbar-right">
-          <span className="user-badge">{displayName}{isAdmin ? ' (Coach)' : ''}</span>
-          <button className="btn-logout" onClick={handleLogout}>Déconnexion</button>
+          <div style={{position:'relative'}}>
+          <span className="user-badge" style={{cursor:'pointer'}} onClick={() => setShowProfileMenu(!showProfileMenu)}>
+            {displayName}{isAdmin ? ' (Coach)' : ''} ▾
+          </span>
+          {showProfileMenu && (
+            <div style={{position:'absolute',right:0,top:'calc(100% + 8px)',background:'white',borderRadius:10,boxShadow:'0 4px 20px rgba(0,0,0,0.15)',padding:'8px 0',minWidth:200,zIndex:150}}>
+              <div style={{padding:'10px 16px',fontSize:13,color:'var(--gray-4)',borderBottom:'1px solid var(--gray-2)',fontWeight:600}}>{displayName}</div>
+              <div style={{padding:'10px 16px',fontSize:13,cursor:'pointer',color:'var(--gray-5)'}} onClick={() => { setShowChangePw(true); setShowProfileMenu(false) }}>
+                🔒 Changer mon mot de passe
+              </div>
+              <div style={{padding:'10px 16px',fontSize:13,cursor:'pointer',color:'var(--red)',borderTop:'1px solid var(--gray-2)'}} onClick={() => { setShowProfileMenu(false); handleLogout() }}>
+                Déconnexion
+              </div>
+            </div>
+          )}
+        </div>
+    
         </div>
       </div>
 
+      {showProfileMenu && <div style={{position:'fixed',inset:0,zIndex:140}} onClick={() => setShowProfileMenu(false)} />}
       <div className="nav-tabs">
         <div className={`nav-tab${activeTab === 'joueurs' ? ' active' : ''}`} onClick={() => setActiveTab('joueurs')}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginRight:5,verticalAlign:-2}}>
