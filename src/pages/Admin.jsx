@@ -104,22 +104,35 @@ export default function Admin() {
         <div className="card-title">📊 Saisir un résultat de test</div>
         <div className="form-group">
           <label className="form-label">Groupe</label>
-          <div className="group-tabs" style={{marginBottom:8}}>
+          <div className="group-tabs" style={{marginBottom:10}}>
             {['+30','+40','+50'].map(g => (
               <div key={g} className={`group-tab${g === filterGroup ? ' active' : ''}`}
-                onClick={() => { setFilterGroup(g); setSelectedPlayer('') }}>{g}</div>
+                onClick={() => { setFilterGroup(g); setSelectedPlayer(''); setPlayerSearch('') }}>{g}</div>
             ))}
           </div>
-          <label className="form-label">Recherche rapide</label>
-          <input className="form-input" type="text" placeholder="Lettre(s) du prénom..."
-            value={playerSearch} onChange={e => setPlayerSearch(e.target.value)} style={{marginBottom:8}} />
           <label className="form-label">Joueur</label>
-          <select className="form-input" value={selectedPlayer} onChange={e => setSelectedPlayer(e.target.value)}>
-            <option value="">Sélectionner un joueur</option>
-            {filteredPlayers.map(p => (
-              <option key={p.id} value={p.id}>{p.first_name} {p.last_name}</option>
-            ))}
-          </select>
+          <div style={{position:'relative'}}>
+            <input
+              className="form-input"
+              type="text"
+              placeholder="Taper le prénom pour filtrer..."
+              value={playerSearch || (selectedPlayer ? (filteredPlayers.find(p=>p.id===selectedPlayer)||{first_name:'',last_name:''}).first_name + ' ' + (filteredPlayers.find(p=>p.id===selectedPlayer)||{first_name:'',last_name:''}).last_name : '')}
+              onChange={e => { setPlayerSearch(e.target.value); setSelectedPlayer('') }}
+              onFocus={e => { if(selectedPlayer) setPlayerSearch('') }}
+              autoComplete="off"
+            />
+            {playerSearch && filteredPlayers.length > 0 && (
+              <div style={{position:'absolute',top:'100%',left:0,right:0,background:'white',border:'1.5px solid var(--gray-3)',borderRadius:8,zIndex:50,maxHeight:200,overflowY:'auto',boxShadow:'0 4px 12px rgba(0,0,0,0.1)'}}>
+                {filteredPlayers.map(p => (
+                  <div key={p.id}
+                    style={{padding:'9px 12px',cursor:'pointer',fontSize:13,borderBottom:'0.5px solid var(--gray-2)'}}
+                    onMouseDown={() => { setSelectedPlayer(p.id); setPlayerSearch('') }}>
+                    {p.first_name} {p.last_name}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         <div className="form-group">
           <label className="form-label">Type de test</label>

@@ -16,11 +16,10 @@ const ROLE_TEXT = { coach: 'white', assistant_coach: 'white', captain: '#5a4500'
 export default function Joueurs({ currentPlayer, isAdmin }) {
   const [players, setPlayers] = useState([])
   const [tests, setTests] = useState([])
-  const [activeGroup, setActiveGroup] = useState(currentPlayer?.group_name || '+30')
+  const [activeGroup, setActiveGroup] = useState('all')
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [searchScope, setSearchScope] = useState('all')
 
   const fetchData = async () => {
     const { data: pData } = await supabase.from('players').select('*').order('last_name')
@@ -48,11 +47,11 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
   }
 
   const normStr = s => { if (!s) return ''; var r = s.toLowerCase().normalize('NFD'); var out = ''; for (var i=0; i<r.length; i++) { var c = r.charCodeAt(i); if (c < 0x300 || c > 0x36f) out += r[i]; } return out.replace(/[^a-z0-9 ]/g, '').trim(); }
+  const inGroup = p => activeGroup === 'all' || p.group_name === activeGroup
   const filtered = search.trim()
     ? players.filter(p => {
         const q = normStr(search)
-        const inScope = searchScope === 'all' || p.group_name === activeGroup
-        if (!inScope) return false
+        if (!inGroup(p)) return false
         return normStr(p.first_name + ' ' + p.last_name).includes(q) ||
           normStr(p.position).includes(q) ||
           normStr(p.preferred_position).includes(q) ||
@@ -61,8 +60,8 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
           p.group_name.includes(search)
       })
     : [
-        ...sortPlayers(players.filter(p => p.group_name === activeGroup && p.active !== false)),
-        ...players.filter(p => p.group_name === activeGroup && p.active === false)
+        ...sortPlayers(players.filter(p => inGroup(p) && p.active !== false)),
+        ...players.filter(p => inGroup(p) && p.active === false)
           .sort((a,b) => (a.born||'9999').localeCompare(b.born||'9999'))
       ]
 
@@ -74,31 +73,24 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
     <>
       <div className="search-wrap">
         <input className="search-input" type="text" placeholder="Rechercher nom, poste, passion..." value={search} onChange={e => setSearch(e.target.value)} />
-        <div style={{display:'flex',gap:6,marginTop:8}}>
-          <span style={{fontSize:11,color:'var(--gray-4)',alignSelf:'center'}}>Rechercher dans :</span>
-          <button onClick={() => setSearchScope('group')} style={{fontSize:11,padding:'3px 10px',borderRadius:20,border:'1.5px solid',borderColor:searchScope==='group'?'var(--red)':'var(--gray-3)',background:searchScope==='group'?'var(--red)':'white',color:searchScope==='group'?'white':'var(--gray-4)',cursor:'pointer'}}>
-            Seniors {activeGroup}
-          </button>
-          <button onClick={() => setSearchScope('all')} style={{fontSize:11,padding:'3px 10px',borderRadius:20,border:'1.5px solid',borderColor:searchScope==='all'?'var(--red)':'var(--gray-3)',background:searchScope==='all'?'var(--red)':'white',color:searchScope==='all'?'white':'var(--gray-4)',cursor:'pointer'}}>
-            Tous
-          </button>
-        </div>
+
       </div>
 
       <div className="content">
         {!search.trim() && (
           <>
             <div className="group-tabs">
+              <div className={`group-tab${activeGroup === 'all' ? ' active' : ''}`} onClick={() => setActiveGroup('all')}>Tous</div>
               {GROUPS.map(g => (
-                <div key={g} className={`group-tab${g === activeGroup ? ' active' : ''}`} onClick={() => { setActiveGroup(g); setSearchScope('group') }}>{g}</div>
+                <div key={g} className={`group-tab${g === activeGroup ? ' active' : ''}`} onClick={() => setActiveGroup(g)}>{g}</div>
               ))}
             </div>
-            <div className="hero-banner">
+            {activeGroup !== 'all' && <div className="hero-banner">
               <img src={TEAM_PHOTOS[activeGroup]} alt="Équipe" className="hero-img" />
               <div className="hero-overlay">
                 <div className="hero-text">{groupLabel[activeGroup]}</div>
               </div>
-            </div>
+            </div>}
           </>
         )}
 
@@ -116,16 +108,14 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
                   }
                   <div className="player-name">
                     {p.first_name} {p.last_name}
+                    {p.team_role === 'coach' && <span className="captain-tag" style={{background:'#c0161a',color:'white'}}>CP</span>}
+                    {p.team_role === 'assistant_coach' && <span className="captain-tag" style={{background:'#e05555',color:'white'}}>CA</span>}
                     {p.team_role === 'captain' && <span className="captain-tag" style={{background:'#FFD700',color:'#5a4500'}}>C</span>}
                     {p.team_role === 'vice_captain' && <span className="captain-tag" style={{background:'#aaa',color:'white'}}>C</span>}
                   </div>
                   <div className="player-pos">{p.preferred_position || p.position || '—'}</div>
                   {p.born && <div className="player-born">{p.born.split('-').reverse().join('.')}</div>}
-                  {p.team_role && ['coach','assistant_coach'].includes(p.team_role) && (
-                    <span className="role-badge" style={{background: ROLE_COLOR[p.team_role], color: ROLE_TEXT[p.team_role]}}>
-                      {ROLE_LABEL[p.team_role]}
-                    </span>
-                  )}
+
                   <span className="player-group-tag">Seniors {p.group_name}</span>
                 </div>
               ))}
