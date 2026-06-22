@@ -16,6 +16,10 @@ export default function App() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [activeTab, setActiveTab] = useState('joueurs')
   const [loading, setLoading] = useState(true)
+  const [showChangePw, setShowChangePw] = useState(false)
+  const [newPw, setNewPw] = useState('')
+  const [pwMsg, setPwMsg] = useState('')
+  const [pwLoading, setPwLoading] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -23,8 +27,13 @@ export default function App() {
       if (session) loadUserData(session.user)
       else setLoading(false)
     })
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session)
+      if (event === 'PASSWORD_RECOVERY') {
+        setShowChangePw(true)
+        setLoading(false)
+        return
+      }
       if (session) loadUserData(session.user)
       else { setCurrentPlayer(null); setIsAdmin(false); setLoading(false) }
     })
@@ -47,8 +56,39 @@ export default function App() {
     setIsAdmin(false)
   }
 
+  const handleChangePw = async (e) => {
+    e.preventDefault()
+    if (newPw.length < 6) { setPwMsg('Minimum 6 caractères'); return }
+    setPwLoading(true)
+    const { error } = await supabase.auth.updateUser({ password: newPw })
+    setPwLoading(false)
+    if (error) {
+      setPwMsg('Erreur: ' + error.message)
+    } else {
+      setPwMsg('Mot de passe mis à jour!')
+      setTimeout(() => { setShowChangePw(false); setNewPw(''); setPwMsg('') }, 1500)
+    }
+  }
+
   if (loading) return <div className="loading" style={{ minHeight: '100vh' }}>Chargement...</div>
   if (!session) return <Login />
+
+  if (showChangePw) return (
+    <div className="login-screen" style={{background:'linear-gradient(160deg,#8b0f12,#c0161a)'}}>
+      <div style={{background:'white',borderRadius:18,padding:'32px 28px',width:320,maxWidth:'90vw',boxShadow:'0 24px 64px rgba(0,0,0,0.4)',textAlign:'center'}}>
+        <h1 style={{fontSize:17,fontWeight:800,color:'var(--red)',marginBottom:6}}>FC St-Prex Seniors</h1>
+        <p style={{fontSize:13,color:'var(--gray-4)',marginBottom:22}}>Choisissez votre nouveau mot de passe</p>
+        <form onSubmit={handleChangePw}>
+          <label className="form-label" style={{textAlign:'left',display:'block'}}>Nouveau mot de passe</label>
+          <input className="form-input" type="password" placeholder="Minimum 6 caractères" value={newPw} onChange={e => setNewPw(e.target.value)} autoComplete="new-password" required />
+          {pwMsg && <p style={{fontSize:13,color:pwMsg.includes('jour') ? 'var(--green)' : 'var(--red)',marginBottom:8}}>{pwMsg}</p>}
+          <button className="btn-primary" type="submit" disabled={pwLoading} style={{marginTop:8}}>
+            {pwLoading ? 'Enregistrement...' : 'Confirmer'}
+          </button>
+        </form>
+      </div>
+    </div>
+  )
 
   const displayName = currentPlayer
     ? `${currentPlayer.first_name} ${currentPlayer.last_name}`
