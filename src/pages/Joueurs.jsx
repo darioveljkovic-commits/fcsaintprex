@@ -13,7 +13,7 @@ const ROLE_LABEL = { coach: 'Coach', assistant_coach: 'Co-Coach', captain: 'Capi
 const ROLE_COLOR = { coach: '#c0161a', assistant_coach: '#8b0f12', captain: '#FFD700', vice_captain: '#e6c200' }
 const ROLE_TEXT = { coach: 'white', assistant_coach: 'white', captain: '#5a4500', vice_captain: '#5a4500' }
 
-export default function Joueurs({ currentPlayer, isAdmin, activeGroup, setActiveGroup }) {
+export default function Joueurs({ currentPlayer, isAdmin, activeGroup, setActiveGroup, onPlayerUpdate }) {
   const [players, setPlayers] = useState([])
   const [tests, setTests] = useState([])
   const [search, setSearch] = useState('')
@@ -27,6 +27,11 @@ export default function Joueurs({ currentPlayer, isAdmin, activeGroup, setActive
     setPlayers(pData || [])
     setTests(tData || [])
     setLoading(false)
+    // Topbar-Avatar: currentPlayer mit photo_url aus frischer Liste syncen
+    if (currentPlayer?.id && onPlayerUpdate) {
+      const fresh = (pData || []).find(p => p.id === currentPlayer.id)
+      if (fresh) onPlayerUpdate(fresh)
+    }
   }
 
   useEffect(() => { fetchData() }, [])

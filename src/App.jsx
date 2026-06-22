@@ -294,7 +294,7 @@ export default function App() {
         </div>}
       </div>
 
-      {activeTab === 'joueurs' && <Joueurs currentPlayer={currentPlayer} isAdmin={isAdmin} activeGroup={activeGroup} setActiveGroup={setActiveGroup} />}
+      {activeTab === 'joueurs' && <Joueurs currentPlayer={currentPlayer} isAdmin={isAdmin} activeGroup={activeGroup} setActiveGroup={setActiveGroup} onPlayerUpdate={setCurrentPlayer} />}
       {activeTab === 'fitness' && <Fitness currentPlayer={currentPlayer} isAdmin={isAdmin} activeGroup={activeGroup} setActiveGroup={setActiveGroup} />}
       {activeTab === 'anniversaires' && <Anniversaires activeGroup={activeGroup} setActiveGroup={setActiveGroup} />}
       {activeTab === 'postes' && <Postes currentPlayer={currentPlayer} isAdmin={isAdmin} activeGroup={activeGroup} setActiveGroup={setActiveGroup} />}
