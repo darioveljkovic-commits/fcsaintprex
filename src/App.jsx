@@ -18,20 +18,26 @@ const SUPABASE_STORAGE = SUPABASE_URL + '/storage/v1/object/public/player-photos
 
 function AvatarImg({ player, displayName }) {
   const [err, setErr] = React.useState(false)
-
   const initials = player
     ? `${player.first_name?.[0] ?? ''}${player.last_name?.[0] ?? ''}`
     : 'FC'
-
-  // URL aus DB oder direkt aus Name konstruieren (Fallback)
-  const getUrl = () => {
-    if (player?.photo_url) return player.photo_url.split('?')[0]
-    if (player?.last_name && player?.first_name) {
-      const key = `${player.last_name}_${player.first_name}`.toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')
-      return `${SUPABASE_STORAGE}/${key}.jpg`
-    }
+  const url = player?.photo_url ? player.photo_url.split('?')[0] : null
+  if (!url || err) {
+    return (
+      <span style={{color:'white',fontWeight:700,fontSize:14,userSelect:'none'}}>
+        {initials}
+      </span>
+    )
+  }
+  return (
+    <img
+      src={url}
+      alt={displayName}
+      style={{width:38,height:38,objectFit:'cover',display:'block',margin:0,padding:0,flexShrink:0}}
+      onError={() => setErr(true)}
+    />
+  )
+}
     return null
   }
 
