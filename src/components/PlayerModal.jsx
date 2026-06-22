@@ -16,7 +16,6 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
   const [success, setSuccess] = useState('')
   const [uploading, setUploading] = useState(false)
   const [lightbox, setLightbox] = useState(false)
-  const [editing, setEditing] = useState(false)
   const [newPw, setNewPw] = useState('')
   const [pwMsg, setPwMsg] = useState('')
   const [pwLoading, setPwLoading] = useState(false)
