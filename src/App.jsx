@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { supabase } from './lib/supabase'
 import Login from './pages/Login'
 import Joueurs from './pages/Joueurs'
@@ -11,6 +11,45 @@ import Privacy from './pages/Privacy'
 import './App.css'
 
 const LOGO = 'https://fcsaintprex.ch/wp-content/uploads/2021/09/cropped-logo_fc_saint_prex.jpg'
+
+
+const SUPABASE_STORAGE = 'https://lymeedgkdurumfdpmitl.supabase.co/storage/v1/object/public/player-photos'
+
+function AvatarImg({ player, displayName }) {
+  const [err, setErr] = React.useState(false)
+
+  // Initialen-Fallback
+  const initials = player
+    ? `${player.first_name?.[0] ?? ''}${player.last_name?.[0] ?? ''}`
+    : 'FC'
+
+  // URL aus DB nehmen, Cache-Buster entfernen für saubereren Load
+  const rawUrl = player?.photo_url
+    ? player.photo_url.split('?')[0]
+    : null
+
+  if (!rawUrl || err) {
+    return (
+      <span style={{
+        display:'flex',alignItems:'center',justifyContent:'center',
+        width:'100%',height:'100%',
+        background:'rgba(255,255,255,0.25)',
+        color:'white',fontWeight:700,fontSize:15
+      }}>
+        {initials}
+      </span>
+    )
+  }
+
+  return (
+    <img
+      src={rawUrl}
+      alt={displayName}
+      style={{width:'100%',height:'100%',objectFit:'cover'}}
+      onError={() => setErr(true)}
+    />
+  )
+}
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -147,25 +186,7 @@ export default function App() {
             }}
             title={displayName}
           >
-            {currentPlayer?.photo_url ? (
-              <img
-                src={currentPlayer.photo_url}
-                alt={displayName}
-                style={{width:'100%',height:'100%',objectFit:'cover'}}
-                onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='flex' }}
-              />
-            ) : null}
-            <span style={{
-              display: currentPlayer?.photo_url ? 'none' : 'flex',
-              alignItems:'center',justifyContent:'center',
-              width:'100%',height:'100%',
-              background:'rgba(255,255,255,0.2)',
-              color:'white',fontWeight:700,fontSize:15,letterSpacing:0
-            }}>
-              {currentPlayer
-                ? `${currentPlayer.first_name?.[0] ?? ''}${currentPlayer.last_name?.[0] ?? ''}`
-                : 'FC'}
-            </span>
+            <AvatarImg player={currentPlayer} displayName={displayName} />
           </button>
 
           {/* Dropdown menu */}
