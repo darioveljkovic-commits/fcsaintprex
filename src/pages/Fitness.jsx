@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react'
 import { supabase, calcVO2, vo2Level, sprintLevel, GROUPS } from '../lib/supabase'
 import PlayerModal from '../components/PlayerModal'
 
-export default function Fitness({ currentPlayer, isAdmin }) {
+export default function Fitness({ currentPlayer, isAdmin, activeGroup, setActiveGroup }) {
+  // Fitness kennt kein 'all' — Fallback auf Spielergruppe oder +30
+  const effGroup = (!activeGroup || activeGroup === 'all')
+    ? (currentPlayer?.group_name || '+30')
+    : activeGroup
   const [players, setPlayers] = useState([])
   const [tests, setTests] = useState([])
-  const [activeGroup, setActiveGroup] = useState(currentPlayer?.group_name || '+30')
   const [activeTest, setActiveTest] = useState('cooper')
   const [selected, setSelected] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -21,8 +24,8 @@ export default function Fitness({ currentPlayer, isAdmin }) {
     fetch()
   }, [])
 
-  const canSee = isAdmin || activeGroup === currentPlayer?.group_name
-  const groupPlayers = players.filter(p => p.group_name === activeGroup)
+  const canSee = isAdmin || effGroup === currentPlayer?.group_name
+  const groupPlayers = players.filter(p => p.group_name === effGroup)
 
   const getRanked = () => {
     return groupPlayers.map(p => {
@@ -51,7 +54,7 @@ export default function Fitness({ currentPlayer, isAdmin }) {
     <div className="content">
       <div className="group-tabs">
         {(isAdmin ? GROUPS : [currentPlayer?.group_name]).map(g => (
-          <div key={g} className={`group-tab${g === activeGroup ? ' active' : ''}`} onClick={() => setActiveGroup(g)}>
+          <div key={g} className={`group-tab${g === effGroup ? ' active' : ''}`} onClick={() => setActiveGroup(g)}>
             {g}
           </div>
         ))}
@@ -69,7 +72,7 @@ export default function Fitness({ currentPlayer, isAdmin }) {
       ) : (
         <div className="card">
           <div className="card-title">
-            {activeTest === 'cooper' ? '🏃 Cooper — VO2max' : '⚡ 30m Sprint'} — Seniors {activeGroup}
+            {activeTest === 'cooper' ? '🏃 Cooper — VO2max' : '⚡ 30m Sprint'} — Seniors {effGroup}
           </div>
           <table className="fitness-table">
             <thead>

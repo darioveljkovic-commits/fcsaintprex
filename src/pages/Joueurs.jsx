@@ -13,10 +13,9 @@ const ROLE_LABEL = { coach: 'Coach', assistant_coach: 'Co-Coach', captain: 'Capi
 const ROLE_COLOR = { coach: '#c0161a', assistant_coach: '#8b0f12', captain: '#FFD700', vice_captain: '#e6c200' }
 const ROLE_TEXT = { coach: 'white', assistant_coach: 'white', captain: '#5a4500', vice_captain: '#5a4500' }
 
-export default function Joueurs({ currentPlayer, isAdmin }) {
+export default function Joueurs({ currentPlayer, isAdmin, activeGroup, setActiveGroup }) {
   const [players, setPlayers] = useState([])
   const [tests, setTests] = useState([])
-  const [activeGroup, setActiveGroup] = useState(currentPlayer?.group_name || 'all')
   const [search, setSearch] = useState('')
   const [searchScope, setSearchScope] = useState('all')
   const [selected, setSelected] = useState(null)

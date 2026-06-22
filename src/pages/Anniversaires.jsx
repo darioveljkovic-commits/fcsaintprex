@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
 import { supabase, getAge, nextBday, GROUPS } from '../lib/supabase'
 
-export default function Anniversaires() {
+export default function Anniversaires({ activeGroup, setActiveGroup }) {
   const [players, setPlayers] = useState([])
-  const [activeGroup, setActiveGroup] = useState('all')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

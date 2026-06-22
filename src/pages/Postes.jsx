@@ -123,9 +123,12 @@ function isGoalie(p, view) {
   return (n.includes('gardien') || n === 'but') && !NOT_GK.some(s => n.includes(s))
 }
 
-export default function Postes({ currentPlayer, isAdmin }) {
+export default function Postes({ currentPlayer, isAdmin, activeGroup, setActiveGroup }) {
+  // Postes kennt kein 'all' — Fallback auf Spielergruppe oder +40
+  const effectiveGroup = (!activeGroup || activeGroup === 'all')
+    ? (currentPlayer?.group_name || '+40')
+    : activeGroup
   const [players, setPlayers] = useState([])
-  const [activeGroup, setActiveGroup] = useState(currentPlayer?.group_name || '+40')
   const [activeView, setActiveView] = useState('poste')
   const [selected, setSelected] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -140,7 +143,7 @@ export default function Postes({ currentPlayer, isAdmin }) {
   const initials = p => `${p.first_name?.[0] || ''}${p.last_name?.[0] || ''}`.toUpperCase()
 
   const grouped = players.filter(p =>
-    p.group_name === activeGroup &&
+    p.group_name === effectiveGroup &&
     norm(p.position || '') !== 'entraineur'
   )
 
@@ -160,7 +163,7 @@ export default function Postes({ currentPlayer, isAdmin }) {
     <div className="content">
       <div className="group-tabs">
         {GROUPS.map(g => (
-          <div key={g} className={`group-tab${g === activeGroup ? ' active' : ''}`}
+          <div key={g} className={`group-tab${g === effectiveGroup ? ' active' : ''}`}
             onClick={() => { setActiveGroup(g); setSelected(null) }}>{g}</div>
         ))}
       </div>

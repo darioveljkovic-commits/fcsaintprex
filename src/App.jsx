@@ -25,6 +25,7 @@ export default function App() {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [showPrivacy, setShowPrivacy] = useState(false)
   const [forcePwChange, setForcePwChange] = useState(false)
+  const [activeGroup, setActiveGroup] = useState(null)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -51,6 +52,7 @@ export default function App() {
       setIsAdmin(roleData.role === 'admin')
       const player = roleData.players || null
       setCurrentPlayer(player)
+      if (player && activeGroup === null) setActiveGroup(player.group_name || 'all')
       // Force PW change if player hasn't set their own password yet
       if (player && player.pw_changed === false) {
         setForcePwChange(true)
@@ -256,10 +258,10 @@ export default function App() {
         </div>}
       </div>
 
-      {activeTab === 'joueurs' && <Joueurs currentPlayer={currentPlayer} isAdmin={isAdmin} />}
-      {activeTab === 'fitness' && <Fitness currentPlayer={currentPlayer} isAdmin={isAdmin} />}
-      {activeTab === 'anniversaires' && <Anniversaires />}
-      {activeTab === 'postes' && <Postes currentPlayer={currentPlayer} isAdmin={isAdmin} />}
+      {activeTab === 'joueurs' && <Joueurs currentPlayer={currentPlayer} isAdmin={isAdmin} activeGroup={activeGroup} setActiveGroup={setActiveGroup} />}
+      {activeTab === 'fitness' && <Fitness currentPlayer={currentPlayer} isAdmin={isAdmin} activeGroup={activeGroup} setActiveGroup={setActiveGroup} />}
+      {activeTab === 'anniversaires' && <Anniversaires activeGroup={activeGroup} setActiveGroup={setActiveGroup} />}
+      {activeTab === 'postes' && <Postes currentPlayer={currentPlayer} isAdmin={isAdmin} activeGroup={activeGroup} setActiveGroup={setActiveGroup} />}
       {activeTab === 'admin' && isAdmin && <Admin />}
       <div style={{textAlign:'center',padding:'12px 0 4px',fontSize:11,color:'rgba(255,255,255,0.0)'}}>
         <span style={{color:'var(--gray-4)',cursor:'pointer'}} onClick={() => setShowPrivacy(true)}>
