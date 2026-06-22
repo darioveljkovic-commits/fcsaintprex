@@ -16,9 +16,6 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
   const [success, setSuccess] = useState('')
   const [uploading, setUploading] = useState(false)
   const [lightbox, setLightbox] = useState(false)
-  const [newPw, setNewPw] = useState('')
-  const [pwMsg, setPwMsg] = useState('')
-  const [pwLoading, setPwLoading] = useState(false)
 
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose() }
@@ -32,19 +29,6 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
   const cooperTests = tests.filter(t => t.test_type === 'cooper').sort((a, b) => a.test_date.localeCompare(b.test_date))
   const sprintTests = tests.filter(t => t.test_type === 'sprint').sort((a, b) => a.test_date.localeCompare(b.test_date))
 
-  const handleChangePw = async () => {
-    if (newPw.length < 6) { setPwMsg('Minimum 6 caractères'); return }
-    setPwLoading(true)
-    const { error } = await supabase.auth.updateUser({ password: newPw })
-    setPwLoading(false)
-    if (error) {
-      setPwMsg('Erreur: ' + error.message)
-    } else {
-      setPwMsg('Mot de passe mis à jour!')
-      setNewPw('')
-      setTimeout(() => setPwMsg(''), 3000)
-    }
-  }
 
   const handleSave = async () => {
     setSaving(true)
@@ -63,6 +47,8 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
       setSuccess('Profil mis à jour!')
       setEditing(false)
       onUpdate()
+      // Update local form state to reflect saved values
+      setForm(f => ({...f}))
       setTimeout(() => setSuccess(''), 3000)
     }
   }
@@ -206,38 +192,25 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
               <label className="form-label">Préférence de poste sur le terrain</label>
               <input className="edit-field" value={form.preferred_position} onChange={e => setForm({ ...form, preferred_position: e.target.value })} placeholder="Milieu défensif, ailier droit..." />
 
-              <label className="form-label">Catégorie d'âge</label>
-              <select className="edit-field" value={form.group_name} onChange={e => setForm({ ...form, group_name: e.target.value })}>
-                <option value="+30">Seniors +30</option>
-                <option value="+40">Seniors +40</option>
-                <option value="+50">Seniors +50</option>
-              </select>
-
-              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:10}}>
-                <input type="checkbox" id="active-check" checked={form.active} onChange={e => setForm({...form, active: e.target.checked})} />
-                <label htmlFor="active-check" style={{fontSize:13,cursor:'pointer'}}>Joueur actif</label>
-              </div>
+              {isAdmin && <>
+                <label className="form-label">Catégorie d'âge</label>
+                <select className="edit-field" value={form.group_name} onChange={e => setForm({ ...form, group_name: e.target.value })}>
+                  <option value="+30">Seniors +30</option>
+                  <option value="+40">Seniors +40</option>
+                  <option value="+50">Seniors +50</option>
+                </select>
+                <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:10}}>
+                  <input type="checkbox" id="active-check" checked={form.active} onChange={e => setForm({...form, active: e.target.checked})} />
+                  <label htmlFor="active-check" style={{fontSize:13,cursor:'pointer'}}>Joueur actif</label>
+                </div>
+              </>}
 
               {success && <div className="success-msg">{success}</div>}
               <button className="btn-red" onClick={handleSave} disabled={saving}>
                 {saving ? 'Enregistrement...' : 'Enregistrer'}
               </button>
 
-              {isOwn && <div style={{marginTop:20,paddingTop:16,borderTop:'1.5px solid var(--gray-2)'}}>
-                <div className="card-title" style={{marginBottom:10,fontSize:13}}>🔒 Changer mon mot de passe</div>
-                <input
-                  className="edit-field"
-                  type="password"
-                  placeholder="Nouveau mot de passe (min. 6 caractères)"
-                  value={newPw}
-                  onChange={e => setNewPw(e.target.value)}
-                  autoComplete="new-password"
-                />
-                {pwMsg && <div style={{fontSize:12,marginBottom:8,color:pwMsg.includes('jour')?'var(--green)':'var(--red)'}}>{pwMsg}</div>}
-                <button className="btn-red" onClick={handleChangePw} disabled={pwLoading || newPw.length < 6} style={{background:'var(--gray-5)'}}>
-                  {pwLoading ? 'Enregistrement...' : 'Confirmer le nouveau mot de passe'}
-                </button>
-              </div>}
+
               </div>}
             </div>
           )}

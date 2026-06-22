@@ -20,6 +20,7 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [searchScope, setSearchScope] = useState('group')
 
   const fetchData = async () => {
     const { data: pData } = await supabase.from('players').select('*').order('last_name')
@@ -46,14 +47,19 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
     })
   }
 
+  const normStr = s => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9 ]/g, '').trim()
   const filtered = search.trim()
-    ? players.filter(p =>
-        `${p.first_name} ${p.last_name}`.toLowerCase().includes(search.toLowerCase()) ||
-        (p.position || '').toLowerCase().includes(search.toLowerCase()) ||
-        (p.job || '').toLowerCase().includes(search.toLowerCase()) ||
-        (p.passions || '').toLowerCase().includes(search.toLowerCase()) ||
-        p.group_name.includes(search)
-      )
+    ? players.filter(p => {
+        const q = normStr(search)
+        const inScope = searchScope === 'all' || p.group_name === activeGroup
+        if (!inScope) return false
+        return normStr(p.first_name + ' ' + p.last_name).includes(q) ||
+          normStr(p.position).includes(q) ||
+          normStr(p.preferred_position).includes(q) ||
+          normStr(p.job).includes(q) ||
+          normStr(p.passions).includes(q) ||
+          p.group_name.includes(search)
+      })
     : [
         ...sortPlayers(players.filter(p => p.group_name === activeGroup && p.active !== false)),
         ...players.filter(p => p.group_name === activeGroup && p.active === false)
@@ -67,7 +73,16 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
   return (
     <>
       <div className="search-wrap">
-        <input className="search-input" type="text" placeholder="Rechercher nom, poste, passion, groupe..." value={search} onChange={e => setSearch(e.target.value)} />
+        <input className="search-input" type="text" placeholder="Rechercher nom, poste, passion..." value={search} onChange={e => setSearch(e.target.value)} />
+        <div style={{display:'flex',gap:6,marginTop:8}}>
+          <span style={{fontSize:11,color:'var(--gray-4)',alignSelf:'center'}}>Rechercher dans :</span>
+          <button onClick={() => setSearchScope('group')} style={{fontSize:11,padding:'3px 10px',borderRadius:20,border:'1.5px solid',borderColor:searchScope==='group'?'var(--red)':'var(--gray-3)',background:searchScope==='group'?'var(--red)':'white',color:searchScope==='group'?'white':'var(--gray-4)',cursor:'pointer'}}>
+            Seniors {activeGroup}
+          </button>
+          <button onClick={() => setSearchScope('all')} style={{fontSize:11,padding:'3px 10px',borderRadius:20,border:'1.5px solid',borderColor:searchScope==='all'?'var(--red)':'var(--gray-3)',background:searchScope==='all'?'var(--red)':'white',color:searchScope==='all'?'white':'var(--gray-4)',cursor:'pointer'}}>
+            Tous
+          </button>
+        </div>
       </div>
 
       <div className="content">
@@ -125,7 +140,14 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
           isOwn={currentPlayer?.id === selected.id}
           isAdmin={isAdmin}
           onClose={() => setSelected(null)}
-          onUpdate={() => { fetchData(); }}
+          onUpdate={async () => {
+            await fetchData()
+            // refresh selected with latest data
+            setSelected(prev => {
+              const updated = players.find(p => p.id === prev?.id)
+              return updated || prev
+            })
+          }}
         />
       )}
     </>
