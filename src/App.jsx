@@ -16,43 +16,32 @@ const LOGO = 'https://fcsaintprex.ch/wp-content/uploads/2021/09/cropped-logo_fc_
 const SUPABASE_STORAGE = 'https://lymeedgkdurumfdpmitl.supabase.co/storage/v1/object/public/player-photos'
 
 function AvatarImg({ player, displayName }) {
-  const [err, setErr] = React.useState(false)
-
   const initials = player
     ? `${player.first_name?.[0] ?? ''}${player.last_name?.[0] ?? ''}`
     : 'FC'
 
-  const buildUrl = (raw) => {
-    if (!raw) return null
-    const clean = raw.split('?')[0]
-    if (clean.startsWith('http')) return clean
-    return SUPABASE_STORAGE + '/' + clean.replace(/^[/]/, '')
+  if (!player?.photo_url) {
+    return (
+      <div style={{
+        width:'100%',height:'100%',
+        display:'flex',alignItems:'center',justifyContent:'center',
+        background:'rgba(255,255,255,0.25)',
+        color:'white',fontWeight:700,fontSize:15
+      }}>{initials}</div>
+    )
   }
 
-  const photoUrl = buildUrl(player?.photo_url)
-  const showPhoto = photoUrl && !err
-
   return (
-    <div style={{width:'100%',height:'100%',position:'relative',borderRadius:'50%',overflow:'hidden'}}>
-      {showPhoto && (
-        <img
-          src={photoUrl}
-          alt={displayName}
-          style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}
-          onError={() => setErr(true)}
-        />
-      )}
-      {!showPhoto && (
-        <div style={{
-          width:'100%',height:'100%',
-          display:'flex',alignItems:'center',justifyContent:'center',
-          background:'rgba(255,255,255,0.25)',
-          color:'white',fontWeight:700,fontSize:15
-        }}>
-          {initials}
-        </div>
-      )}
-    </div>
+    <img
+      src={player.photo_url}
+      alt={displayName}
+      className="player-photo"
+      style={{width:'38px',height:'38px',margin:0}}
+      onError={e => {
+        e.target.style.display = 'none'
+        e.target.parentNode.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.25);color:white;font-weight:700;font-size:15px">${initials}</div>`
+      }}
+    />
   )
 }
 
