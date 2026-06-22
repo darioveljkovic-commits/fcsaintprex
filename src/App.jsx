@@ -83,7 +83,12 @@ export default function App() {
     const { data: roleData } = await supabase.from('user_roles').select('*, players(*)').eq('user_id', user.id).single()
     if (roleData) {
       setIsAdmin(roleData.role === 'admin')
-      const player = roleData.players || null
+      // Player direkt laden um sicherzustellen dass alle Felder inkl. photo_url vorhanden sind
+      let player = roleData.players || null
+      if (player?.id) {
+        const { data: fullPlayer } = await supabase.from('players').select('*').eq('id', player.id).single()
+        if (fullPlayer) player = fullPlayer
+      }
       setCurrentPlayer(player)
       if (player && activeGroup === null) setActiveGroup(player.group_name || 'all')
       // Force PW change if player hasn't set their own password yet
