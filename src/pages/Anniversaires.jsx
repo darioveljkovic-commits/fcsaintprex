@@ -36,7 +36,10 @@ export default function Anniversaires() {
             const initials = `${p.first_name?.[0] || ''}${p.last_name?.[0] || ''}`.toUpperCase()
             return (
               <div key={p.id} className={`bday-row ${cls}`}>
-                <div className="bday-avatar">{initials}</div>
+                {p.photo_url
+                  ? <img src={p.photo_url} alt={initials} style={{width:34,height:34,borderRadius:'50%',objectFit:'cover',flexShrink:0}} />
+                  : <div className="bday-avatar">{initials}</div>
+                }
                 <div style={{ flex: 1 }}>
                   <div className="bday-name">
                     {p.first_name} {p.last_name}

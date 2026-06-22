@@ -105,11 +105,7 @@ export default function App() {
 
       <div className="nav-tabs">
         <div className={`nav-tab${activeTab === 'joueurs' ? ' active' : ''}`} onClick={() => setActiveTab('joueurs')}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginRight:5,verticalAlign:-2}}>
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M12 2a10 10 0 0 1 6.56 2.45L12 12 5.44 4.45A10 10 0 0 1 12 2z" fill="currentColor" opacity=".3"/>
-            <path d="m12 12 6.56 7.55A10 10 0 0 1 5.44 19.55L12 12z" fill="currentColor" opacity=".3"/>
-          </svg>Joueurs
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAACVElEQVR4nJWTS0hUURzGv/85984dR5wZNR1HXDgq4cZnWFAUElZuglYtgzbSpseiDCqIBBdlEFQQtGzZpkWbti0iexBJLkLwEURl6jg6zni95/Fv4aNs7gSd3YH/j/Od7/99NNXehNBDBK0BwHHAHDoiypGslKhPibp6VgpE/wMLwWv5yqPHY/0DvJaHCB9zwmFmcl2npY2NhuOWkx0KE7SmRDLa2c3GiHgcxoQqD9MjiIPAzbR6mVavpc1pznCwEao8DCZirSKdPU4i6VTXeB3d5TwrgYkAoohX0dtHQgghovv2k+uCqJTfDQsBY2wuK9ONXkcnmMEc7eiWqbRdXobWf4n/4yIlFwoy1VAxMKhnZ/zJT5uv+ZMT+sts7NigbEhzoQApf6vcSpgQXCyK6uq6sYfRrp75S+fU7HTTsxew9uupE+7e9tS9R/7H9wuXz9tcjmIxWLsNE3EQyFRD3Z378UNHAASrK9+HzlQcPMxG+29epx8/icQTAFZfvVwYvmh+/iA3Amaaam8CMxy35sp1pzlDxrJWsa5e9rz54QsAUmMPyPeLEx/IdSGkmpvOjo1CaxDthISX747yxgaktCu52pHb0b4D7PsAB3Mz62/HszevikQSxpDn7fzZ2VqP1gxASghBkQgXi0sjN+Jnh6D14q1rlf0D5EY2rWaltje6Y9iuVQtIAUbj0+ew5tvpk5AOjC5NeFi22cKwXcuvvxtno20+L6qqQrtRplVCQCk19RnGwOjN8JROhcneckGJ2j1g2OxiuVaW7TMc1y4tgfCPPv8CRCn+3MDSDHUAAAAASUVORK5CYII=" style={{width:16,height:16,objectFit:'contain',marginRight:5,verticalAlign:-2}} alt="" />Joueurs
         </div>
         <div className={`nav-tab${activeTab === 'postes' ? ' active' : ''}`} onClick={() => setActiveTab('postes')}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginRight:5,verticalAlign:-2}}>
