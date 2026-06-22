@@ -16,8 +16,9 @@ const ROLE_TEXT = { coach: 'white', assistant_coach: 'white', captain: '#5a4500'
 export default function Joueurs({ currentPlayer, isAdmin }) {
   const [players, setPlayers] = useState([])
   const [tests, setTests] = useState([])
-  const [activeGroup, setActiveGroup] = useState('all')
+  const [activeGroup, setActiveGroup] = useState(currentPlayer?.group_name || 'all')
   const [search, setSearch] = useState('')
+  const [searchScope, setSearchScope] = useState('all')
   const [selected, setSelected] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -48,10 +49,11 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
 
   const normStr = s => { if (!s) return ''; var r = s.toLowerCase().normalize('NFD'); var out = ''; for (var i=0; i<r.length; i++) { var c = r.charCodeAt(i); if (c < 0x300 || c > 0x36f) out += r[i]; } return out.replace(/[^a-z0-9 ]/g, '').trim(); }
   const inGroup = p => activeGroup === 'all' || p.group_name === activeGroup
+  const inSearchScope = p => searchScope === 'all' || p.group_name === activeGroup
   const filtered = search.trim()
     ? players.filter(p => {
         const q = normStr(search)
-        if (!inGroup(p)) return false
+        if (!inSearchScope(p)) return false
         if (p.status === 'sorti') return false
         return normStr(p.first_name + ' ' + p.last_name).includes(q) ||
           normStr(p.position).includes(q) ||

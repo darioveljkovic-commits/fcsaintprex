@@ -143,7 +143,7 @@ export default function Admin() {
         </div>
         <div className="form-group">
           <label className="form-label">Date</label>
-          <input className="form-input" type="date" value={testDate} onChange={e => setTestDate(e.target.value)} />
+          <input className="form-input" type="date" value={testDate} onChange={e => setTestDate(e.target.value)} style={{maxWidth:160}} />
         </div>
         <div className="form-group">
           <label className="form-label">{testType === 'cooper' ? 'Distance parcourue (mètres)' : 'Temps (secondes)'}</label>

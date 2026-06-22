@@ -62,7 +62,8 @@ export default function App() {
 
   const handleChangePw = async (e) => {
     e.preventDefault()
-    if (newPw.length < 6) { setPwMsg('Minimum 6 caractères'); return }
+    if (newPw.length < 8) { setPwMsg('Minimum 8 caractères'); return }
+    if (!/\d/.test(newPw)) { setPwMsg('Le mot de passe doit contenir au moins un chiffre'); return }
     setPwLoading(true)
     const { error } = await supabase.auth.updateUser({ password: newPw })
     setPwLoading(false)
@@ -156,7 +157,7 @@ export default function App() {
             <h3 style={{fontSize:15,fontWeight:700,color:'var(--red)',marginBottom:16,textAlign:'center'}}>Changer mon mot de passe</h3>
             <form onSubmit={handleChangePw}>
               <label className="form-label">Nouveau mot de passe</label>
-              <input className="form-input" type="password" placeholder="Minimum 6 caractères" value={newPw} onChange={e => setNewPw(e.target.value)} autoComplete="new-password" required style={{marginBottom:12}} />
+              <input className="form-input" type="password" placeholder="Min. 8 caractères dont 1 chiffre" value={newPw} onChange={e => setNewPw(e.target.value)} autoComplete="new-password" required style={{marginBottom:12}} />
               {pwMsg && <p style={{fontSize:13,color:pwMsg.includes('jour')?'var(--green)':'var(--red)',marginBottom:8}}>{pwMsg}</p>}
               <button className="btn-primary" type="submit" disabled={pwLoading} style={{marginBottom:8}}>
                 {pwLoading ? 'Enregistrement...' : 'Confirmer'}
