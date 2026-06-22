@@ -9,6 +9,7 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
     passions: player.passions || '',
     preferred_position: player.preferred_position || '',
     position: player.position || '',
+    city: player.city || '',
     active: player.active !== false,
     group_name: player.group_name || '+40',
   })
@@ -44,8 +45,7 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
   const initials = `${player.first_name?.[0] || ''}${player.last_name?.[0] || ''}`.toUpperCase()
   const fullName = `${player.first_name} ${player.last_name}`
 
-  const cooperTests = tests.filter(t => t.test_type === 'cooper').sort((a, b) => a.test_date.localeCompare(b.test_date))
-  const sprintTests = tests.filter(t => t.test_type === 'sprint').sort((a, b) => a.test_date.localeCompare(b.test_date))
+
 
 
   const handleSave = async () => {
@@ -55,6 +55,7 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
       tel: form.tel || null,
       passions: form.passions || null,
       preferred_position: form.preferred_position || null,
+      city: form.city || null,
       active: form.active,
       group_name: form.group_name,
     }
@@ -131,8 +132,7 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
     )
   }
 
-  const lastCooper = cooperTests[cooperTests.length - 1]
-  const lastSprint = sprintTests[sprintTests.length - 1]
+
 
   const modal = (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
@@ -162,36 +162,13 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
               {player.tel ? <a href={`tel:${player.tel}`} style={{ color: 'var(--red)', fontWeight: 600 }}>{player.tel}</a> : '—'}
             </span>
           </div>
-          <div className="info-row"><span className="info-label">Né le</span><span className="info-value">{player.born || '—'}</span></div>
+          <div className="info-row"><span className="info-label">Né le</span><span className="info-value">
+            {player.born ? player.born.split('-').reverse().join('.') : '—'}
+          </span></div>
           <div className="info-row"><span className="info-label">Âge</span><span className="info-value">{getAge(player.born)} ans</span></div>
+          <div className="info-row"><span className="info-label">Ville</span><span className="info-value">{player.city || '—'}</span></div>
 
-          {/* FITNESS */}
-          {tests.length > 0 ? (
-            <>
-              {cooperTests.length > 0 && (
-                <>
-                  <div className="section-title">🏃 Cooper — VO2max</div>
-                  {renderMiniChart(cooperTests, true)}
-                  {lastCooper && (() => {
-                    const lv = vo2Level(calcVO2(lastCooper.value))
-                    return <span className={`pill pill-${lv.c}`}>VO2max: {calcVO2(lastCooper.value).toFixed(1)} — {lv.l}</span>
-                  })()}
-                </>
-              )}
-              {sprintTests.length > 0 && (
-                <>
-                  <div className="section-title" style={{ marginTop: 14 }}>⚡ 30m Sprint</div>
-                  {renderMiniChart(sprintTests, false)}
-                  {lastSprint && (() => {
-                    const lv = sprintLevel(lastSprint.value)
-                    return <span className={`pill pill-${lv.c}`}>Dernier: {lastSprint.value.toFixed(2)}s — {lv.l}</span>
-                  })()}
-                </>
-              )}
-            </>
-          ) : (
-            <p style={{ color: 'var(--gray-4)', fontSize: 13, marginTop: 12 }}>Aucun test enregistré.</p>
-          )}
+
 
           {/* EDIT SECTION - own profile only */}
           {(isOwn || isAdmin) && (
@@ -225,20 +202,25 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
 
               <label className="form-label">Passions / Hobbies</label>
               <input className="edit-field" value={form.passions} onChange={e => setForm({ ...form, passions: e.target.value })} placeholder="Tennis, cuisine, voyages..." />
+              <label className="form-label">Ville</label>
+              <input className="edit-field" value={form.city || ''} onChange={e => setForm({ ...form, city: e.target.value })} placeholder="Saint-Prex, Morges..." />
 
-              {isAdmin && <>
+              <div style={{background:'var(--gray-1)',borderRadius:8,padding:'10px 12px',marginBottom:12}}>
+                <div style={{fontSize:11,fontWeight:700,color:'var(--gray-4)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:8}}>Mes informations</div>
+                <label className="form-label">Préférence de poste</label>
+                <select className="edit-field" value={form.preferred_position || ''} onChange={e => setForm({ ...form, preferred_position: e.target.value })}>
+                  <option value="">— Sélectionner une préférence —</option>
+                  {positions.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
+                </select>
+              </div>
+
+              {isAdmin && <div style={{background:'#fdecea',borderRadius:8,padding:'10px 12px',marginBottom:12,border:'1px solid #f5c6c6'}}>
+                <div style={{fontSize:11,fontWeight:700,color:'var(--red)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:8}}>⚙️ Admin uniquement</div>
                 <label className="form-label">Poste (attribué par le coach)</label>
                 <select className="edit-field" value={form.position || ''} onChange={e => setForm({ ...form, position: e.target.value })}>
                   <option value="">— Sélectionner un poste —</option>
                   {positions.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
                 </select>
-              </>}
-
-              <label className="form-label">Préférence de poste</label>
-              <select className="edit-field" value={form.preferred_position || ''} onChange={e => setForm({ ...form, preferred_position: e.target.value })}>
-                <option value="">— Sélectionner une préférence —</option>
-                {positions.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
-              </select>
 
               {isAdmin && <>
                 <label className="form-label">Catégorie d'âge</label>
@@ -252,6 +234,7 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
                   <label htmlFor="active-check" style={{fontSize:13,cursor:'pointer'}}>Joueur actif</label>
                 </div>
               </>}
+              </div>}
 
               {success && <div className="success-msg">{success}</div>}
               <button className="btn-red" onClick={handleSave} disabled={saving}>

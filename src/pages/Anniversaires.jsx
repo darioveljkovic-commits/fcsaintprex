@@ -7,7 +7,7 @@ export default function Anniversaires() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase.from('players').select('*').eq('active', true).then(({ data }) => {
+    supabase.from('players').select('*').then(({ data }) => {
       setPlayers((data || []).map(p => ({ ...p, days: nextBday(p.born) })).sort((a, b) => a.days - b.days))
       setLoading(false)
     })

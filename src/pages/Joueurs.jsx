@@ -20,7 +20,7 @@ export default function Joueurs({ currentPlayer, isAdmin }) {
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [searchScope, setSearchScope] = useState('group')
+  const [searchScope, setSearchScope] = useState('all')
 
   const fetchData = async () => {
     const { data: pData } = await supabase.from('players').select('*').order('last_name')

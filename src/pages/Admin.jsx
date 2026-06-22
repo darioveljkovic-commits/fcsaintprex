@@ -4,6 +4,8 @@ import { supabase, calcVO2, vo2Level, sprintLevel, GROUPS } from '../lib/supabas
 export default function Admin() {
   const [players, setPlayers] = useState([])
   const [selectedPlayer, setSelectedPlayer] = useState('')
+  const [filterGroup, setFilterGroup] = useState('+40')
+  const [playerSearch, setPlayerSearch] = useState('')
   const [testType, setTestType] = useState('cooper')
   const [testDate, setTestDate] = useState(new Date().toISOString().split('T')[0])
   const [value, setValue] = useState('')
@@ -86,6 +88,14 @@ export default function Admin() {
     setInviting(false)
   }
 
+  const filteredPlayers = players
+    .filter(p => p.group_name === filterGroup)
+    .filter(p => {
+      if (!playerSearch) return true
+      const q = playerSearch.toLowerCase()
+      return p.first_name.toLowerCase().startsWith(q) || p.last_name.toLowerCase().startsWith(q)
+    })
+
   return (
     <div className="content">
 
@@ -93,11 +103,21 @@ export default function Admin() {
       <div className="card">
         <div className="card-title">📊 Saisir un résultat de test</div>
         <div className="form-group">
+          <label className="form-label">Groupe</label>
+          <div className="group-tabs" style={{marginBottom:8}}>
+            {['+30','+40','+50'].map(g => (
+              <div key={g} className={`group-tab${g === filterGroup ? ' active' : ''}`}
+                onClick={() => { setFilterGroup(g); setSelectedPlayer('') }}>{g}</div>
+            ))}
+          </div>
+          <label className="form-label">Recherche rapide</label>
+          <input className="form-input" type="text" placeholder="Lettre(s) du prénom..."
+            value={playerSearch} onChange={e => setPlayerSearch(e.target.value)} style={{marginBottom:8}} />
           <label className="form-label">Joueur</label>
           <select className="form-input" value={selectedPlayer} onChange={e => setSelectedPlayer(e.target.value)}>
             <option value="">Sélectionner un joueur</option>
-            {players.map(p => (
-              <option key={p.id} value={p.id}>{p.first_name} {p.last_name} ({p.group_name})</option>
+            {filteredPlayers.map(p => (
+              <option key={p.id} value={p.id}>{p.first_name} {p.last_name}</option>
             ))}
           </select>
         </div>
