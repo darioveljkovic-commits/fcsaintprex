@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase, getAge, nextBday, GROUPS } from '../lib/supabase'
+import { supabase, getAge, nextBday, GROUPS, displayFirst } from '../lib/supabase'
 
 export default function Anniversaires({ activeGroup, setActiveGroup }) {
   const [players, setPlayers] = useState([])
@@ -32,7 +32,7 @@ export default function Anniversaires({ activeGroup, setActiveGroup }) {
             const d = new Date(p.born)
             const lbl = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')} — ${getAge(p.born)} ans`
             const cls = p.days === 0 ? 'today' : p.days <= 14 ? 'soon' : ''
-            const initials = `${p.first_name?.[0] || ''}${p.last_name?.[0] || ''}`.toUpperCase()
+            const initials = `${displayFirst(p)[0] || ''}${p.last_name?.[0] || ''}`.toUpperCase()
             return (
               <div key={p.id} className={`bday-row ${cls}`}>
                 {p.photo_url
@@ -41,7 +41,8 @@ export default function Anniversaires({ activeGroup, setActiveGroup }) {
                 }
                 <div style={{ flex: 1 }}>
                   <div className="bday-name">
-                    {p.first_name} {p.last_name}
+                    <span style={{fontWeight:700,color:'var(--red)'}}>{displayFirst(p)}</span>{' '}{p.last_name}
+                    {p.nickname && <span style={{fontSize:11,color:'var(--gray-4)',marginLeft:4}}>({p.first_name})</span>}
                     <span style={{ fontSize: 11, color: 'var(--gray-4)', marginLeft: 4 }}>({p.group_name})</span>
                   </div>
                   <div className="bday-date">{lbl}</div>

@@ -11,7 +11,8 @@ import Consent from './pages/Consent'
 import Privacy from './pages/Privacy'
 import './App.css'
 
-const LOGO = 'https://fcsaintprex.ch/wp-content/uploads/2021/09/cropped-logo_fc_saint_prex.jpg'
+// Logo lokal in public/logo_fc_stprex.jpg ablegen (von fcsaintprex.ch herunterladen)
+const LOGO = process.env.PUBLIC_URL + '/logo_fc_stprex.jpg'
 
 
 

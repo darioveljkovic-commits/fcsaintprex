@@ -59,6 +59,9 @@ export default function Admin() {
       setValue('')
       setPreview(null)
       setTimeout(() => setSuccess(''), 3000)
+    } else {
+      setSuccess('Erreur: ' + error.message)
+      setTimeout(() => setSuccess(''), 4000)
     }
   }
 
@@ -73,6 +76,9 @@ export default function Admin() {
       const { data } = await supabase.from('players').select('*').neq('status', 'sorti').order('last_name')
       setPlayers(data || [])
       setTimeout(() => setPlayerSuccess(''), 3000)
+    } else {
+      setPlayerSuccess('Erreur: ' + error.message)
+      setTimeout(() => setPlayerSuccess(''), 4000)
     }
   }
 
