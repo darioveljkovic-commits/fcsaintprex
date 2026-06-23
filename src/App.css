@@ -41,7 +41,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 /* TOPBAR */
 .topbar { background: var(--red); color: #fff; padding: 0 16px; height: 52px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
 .topbar-left { display: flex; align-items: center; gap: 8px; }
-.topbar img { width: 32px; height: 32px; object-fit: contain; border-radius: 4px; filter: brightness(0) invert(1); }
+.topbar img { width: 32px; height: 32px; object-fit: contain; border-radius: 6px; }
+.topbar-left img { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; }
 .topbar h2 { font-size: 14px; font-weight: 800; letter-spacing: .8px; }
 .topbar-right { display: flex; align-items: center; gap: 8px; }
 .user-badge { font-size: 11px; background: rgba(255,255,255,0.18); padding: 3px 9px; border-radius: 20px; }
