@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase, GROUPS, getAge } from '../lib/supabase'
+import { supabase, GROUPS, getAge, displayFirst } from '../lib/supabase'
 import PlayerModal from '../components/PlayerModal'
 
 const TEAM_PHOTOS = {
