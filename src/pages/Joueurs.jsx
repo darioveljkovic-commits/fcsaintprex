@@ -118,10 +118,6 @@ export default function Joueurs({ currentPlayer, isAdmin, activeGroup, setActive
                 <div key={p.id} className={`player-card${p.status === 'pause' ? ' player-inactive' : ''}`} onClick={() => setSelected(p)}>
                   <div className="player-card-top">
                     {p.born && <span className="player-age">{getAge(p.born)}</span>}
-                    {p.team_role === 'coach' && <span className="role-badge" style={{background:'#c0161a',color:'white'}}>CP</span>}
-                    {p.team_role === 'assistant_coach' && <span className="role-badge" style={{background:'#e05555',color:'white'}}>CA</span>}
-                    {p.team_role === 'captain' && <span className="role-badge" style={{background:'#FFD700',color:'#5a4500'}}>C</span>}
-                    {p.team_role === 'vice_captain' && <span className="role-badge" style={{background:'#aaa',color:'white'}}>C</span>}
                   </div>
                   {p.photo_url
                     ? <img src={p.photo_url} className="player-photo" alt={p.last_name} />
@@ -129,6 +125,10 @@ export default function Joueurs({ currentPlayer, isAdmin, activeGroup, setActive
                   }
                   <div className="player-name">
                     <span style={{fontWeight:700,fontSize:14,color:'var(--red)'}}>{displayFirst(p)}</span>
+                    {p.team_role === 'coach' && <span className="role-badge" style={{background:'#c0161a',color:'white'}}>CP</span>}
+                    {p.team_role === 'assistant_coach' && <span className="role-badge" style={{background:'#e05555',color:'white'}}>CA</span>}
+                    {p.team_role === 'captain' && <span className="role-badge" style={{background:'#FFD700',color:'#5a4500'}}>C</span>}
+                    {p.team_role === 'vice_captain' && <span className="role-badge" style={{background:'#aaa',color:'white'}}>C</span>}
                     <div style={{fontSize:11,color:'var(--red)',lineHeight:1.2,fontWeight:600}}>{p.first_name} {p.last_name}</div>
                   </div>
                   <div className="player-pos">{p.preferred_position || p.position || '—'}</div>
