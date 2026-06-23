@@ -39,7 +39,7 @@ function AvatarImg({ player, displayName }) {
       src={photoUrl}
       alt={displayName}
       onError={() => setPhotoUrl(null)}
-      style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'cover', display: 'block' }}
+      style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'cover', display: 'block', filter: 'none' }}
     />
   )
 }
