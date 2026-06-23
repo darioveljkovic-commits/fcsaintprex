@@ -14,7 +14,8 @@ export default function Admin() {
   const [success, setSuccess] = useState('')
 
   // New player form
-  const [newPlayer, setNewPlayer] = useState({ first_name: '', last_name: '', born: '', group_name: '+40', position: '', job: '', captain: false })
+  const [newPlayer, setNewPlayer] = useState({ first_name: '', last_name: '', born: '', group_name: '+40', position: '', preferred_position: '', job: '', tel: '', city: '', status: 'actif', captain: false })
+  const [positions, setPositions] = useState([])
   const [addingPlayer, setAddingPlayer] = useState(false)
   const [playerSuccess, setPlayerSuccess] = useState('')
   const [inviteEmail, setInviteEmail] = useState('')
@@ -24,6 +25,7 @@ export default function Admin() {
 
   useEffect(() => {
     supabase.from('players').select('*').neq('status', 'sorti').order('last_name').then(({ data }) => setPlayers(data || []))
+    supabase.from('positions').select('*').order('name').then(({ data }) => setPositions(data || []))
   }, [])
 
   const handleValueChange = (v) => {
@@ -67,8 +69,8 @@ export default function Admin() {
     setAddingPlayer(false)
     if (!error) {
       setPlayerSuccess('Joueur ajouté!')
-      setNewPlayer({ first_name: '', last_name: '', born: '', group_name: '+40', position: '', job: '', captain: false })
-      const { data } = await supabase.from('players').select('*').eq('active', true).order('last_name')
+      setNewPlayer({ first_name: '', last_name: '', born: '', group_name: '+40', position: '', preferred_position: '', job: '', tel: '', city: '', status: 'actif', captain: false })
+      const { data } = await supabase.from('players').select('*').neq('status', 'sorti').order('last_name')
       setPlayers(data || [])
       setTimeout(() => setPlayerSuccess(''), 3000)
     }
@@ -205,12 +207,42 @@ WHERE p.id = '${invitePlayer}';`
           </div>
           <div>
             <label className="form-label">Poste</label>
-            <input className="form-input" value={newPlayer.position} onChange={e => setNewPlayer({ ...newPlayer, position: e.target.value })} placeholder="Milieu, Défenseur..." />
+            <select className="form-input" value={newPlayer.position} onChange={e => setNewPlayer({ ...newPlayer, position: e.target.value })}>
+              <option value="">— Sélectionner —</option>
+              {positions.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
+            </select>
+          </div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
+          <div>
+            <label className="form-label">Préférence poste</label>
+            <select className="form-input" value={newPlayer.preferred_position} onChange={e => setNewPlayer({ ...newPlayer, preferred_position: e.target.value })}>
+              <option value="">— Préférence —</option>
+              {positions.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="form-label">Statut</label>
+            <select className="form-input" value={newPlayer.status} onChange={e => setNewPlayer({ ...newPlayer, status: e.target.value })}>
+              <option value="actif">Actif</option>
+              <option value="pause">En pause</option>
+              <option value="sorti">Sorti du club</option>
+            </select>
           </div>
         </div>
         <div className="form-group" style={{ marginTop: 10 }}>
           <label className="form-label">Profession</label>
           <input className="form-input" value={newPlayer.job} onChange={e => setNewPlayer({ ...newPlayer, job: e.target.value })} placeholder="Mécanicien, Médecin..." />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
+          <div>
+            <label className="form-label">Téléphone</label>
+            <input className="form-input" value={newPlayer.tel} onChange={e => setNewPlayer({ ...newPlayer, tel: e.target.value })} placeholder="+41 79 000 00 00" />
+          </div>
+          <div>
+            <label className="form-label">Ville</label>
+            <input className="form-input" value={newPlayer.city} onChange={e => setNewPlayer({ ...newPlayer, city: e.target.value })} placeholder="Saint-Prex, Morges..." />
+          </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <input type="checkbox" id="captain" checked={newPlayer.captain} onChange={e => setNewPlayer({ ...newPlayer, captain: e.target.checked })} />
