@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { supabase } from './lib/supabase'
+import { supabase, displayFirst } from './lib/supabase'
 import Login from './pages/Login'
 import Joueurs from './pages/Joueurs'
+import PlayerModal from './components/PlayerModal'
 import Fitness from './pages/Fitness'
 import Anniversaires from './pages/Anniversaires'
 import Admin from './pages/Admin'
@@ -27,7 +28,7 @@ function AvatarImg({ player, displayName }) {
   }, [player?.id, player?.photo_url])
 
   const initials = player
-    ? `${player.first_name?.[0] ?? ''}${player.last_name?.[0] ?? ''}`.toUpperCase()
+    ? `${displayFirst(player)[0] ?? ''}${player.last_name?.[0] ?? ''}`.toUpperCase()
     : 'FC'
 
   if (!photoUrl) {
@@ -55,6 +56,7 @@ export default function App() {
   const [pwMsg, setPwMsg] = useState('')
   const [pwLoading, setPwLoading] = useState(false)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
+  const [showOwnProfile, setShowOwnProfile] = useState(false)
   const [showPrivacy, setShowPrivacy] = useState(false)
   const [activeGroup, setActiveGroup] = useState(null)
 
@@ -156,7 +158,7 @@ export default function App() {
 
 
   const displayName = currentPlayer
-    ? `${currentPlayer.first_name} ${currentPlayer.last_name}`
+    ? `${displayFirst(currentPlayer)} ${currentPlayer.last_name}`
     : 'FC St-Prex Seniors'
 
   return (
@@ -207,6 +209,24 @@ export default function App() {
                     <div style={{fontSize:11,color:'#999',marginTop:2}}>Admin</div>
                   )}
                 </div>
+
+                {/* Mein Profil */}
+                <button
+                  onClick={() => { setShowProfileMenu(false); setShowOwnProfile(true) }}
+                  style={{
+                    width:'100%',background:'none',border:'none',
+                    textAlign:'left',padding:'12px 16px',
+                    fontSize:13,color:'#333',cursor:'pointer',
+                    display:'flex',alignItems:'center',gap:10
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background='#f9f9f9'}
+                  onMouseLeave={e => e.currentTarget.style.background='none'}
+                >
+                  <span style={{fontSize:16}}>\ud83d\udc64</span> Mon profil
+                </button>
+
+                {/* Divider */}
+                <div style={{height:1,background:'#f0f0f0'}} />
 
                 {/* Change PW */}
                 <button
@@ -283,6 +303,17 @@ export default function App() {
       </div>
 
       {showPrivacy && <Privacy onClose={() => setShowPrivacy(false)} />}
+
+      {showOwnProfile && currentPlayer && (
+        <PlayerModal
+          player={currentPlayer}
+          tests={[]}
+          isOwn={true}
+          isAdmin={isAdmin}
+          onClose={() => setShowOwnProfile(false)}
+          onUpdate={() => loadUserData(session.user)}
+        />
+      )}
 
       {showChangePw && (
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:500,display:'flex',alignItems:'center',justifyContent:'center'}}>

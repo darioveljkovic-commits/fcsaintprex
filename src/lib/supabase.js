@@ -33,3 +33,7 @@ export const nextBday = (born) => {
 }
 
 export const GROUPS = ['+30', '+40', '+50']
+
+// Rufname-Helper: Rufname (nickname) wenn gesetzt, sonst Vorname
+export const displayFirst = (player) => player?.nickname || player?.first_name || ''
+export const displayName = (player) => `${displayFirst(player)} ${player?.last_name || ''}`.trim()

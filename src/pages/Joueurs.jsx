@@ -36,7 +36,7 @@ export default function Joueurs({ currentPlayer, isAdmin, activeGroup, setActive
 
   useEffect(() => { fetchData() }, [])
 
-  const initials = (p) => `${p.first_name?.[0] || ''}${p.last_name?.[0] || ''}`.toUpperCase()
+  const initials = (p) => `${displayFirst(p)[0] || ''}${p.last_name?.[0] || ''}`.toUpperCase()
 
   const sortPlayers = (list) => {
     return [...list].sort((a, b) => {
@@ -61,7 +61,7 @@ export default function Joueurs({ currentPlayer, isAdmin, activeGroup, setActive
         const q = normStr(search)
         if (!inSearchScope(p)) return false
         if (p.status === 'sorti') return false
-        return normStr(p.first_name + ' ' + p.last_name).includes(q) ||
+        return normStr(p.first_name + ' ' + p.last_name + ' ' + (p.nickname||'')).includes(q) ||
           normStr(p.position).includes(q) ||
           normStr(p.preferred_position).includes(q) ||
           normStr(p.job).includes(q) ||
@@ -124,7 +124,8 @@ export default function Joueurs({ currentPlayer, isAdmin, activeGroup, setActive
                     : <div className="player-avatar">{initials(p)}</div>
                   }
                   <div className="player-name">
-                    {p.first_name} {p.last_name}
+                    <span style={{fontWeight:700,fontSize:14,color:'var(--red)'}}>{displayFirst(p)}</span>
+                    <div style={{fontSize:11,color:'#999',lineHeight:1.2}}>{p.first_name} {p.last_name}</div>
                     {p.team_role === 'coach' && <span className="captain-tag" style={{background:'#c0161a',color:'white'}}>CP</span>}
                     {p.team_role === 'assistant_coach' && <span className="captain-tag" style={{background:'#e05555',color:'white'}}>CA</span>}
                     {p.team_role === 'captain' && <span className="captain-tag" style={{background:'#FFD700',color:'#5a4500'}}>C</span>}
