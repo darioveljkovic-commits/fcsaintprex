@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase, GROUPS } from '../lib/supabase'
+import { supabase, GROUPS, displayFirst } from '../lib/supabase'
 
 // Strict position mapping - exact normalized strings only
 const POSITION_COORDS = {
@@ -217,7 +217,7 @@ export default function Postes({ currentPlayer, isAdmin, activeGroup, setActiveG
                   ? <img src={p.photo_url} alt={p.last_name} style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:'50%'}}/>
                   : initials(p)}
               </div>
-              <div className="field-name">{p.last_name}</div>
+              <div className="field-name">{displayFirst(p)}</div>
             </div>
           ))}
         </div>
@@ -242,7 +242,7 @@ export default function Postes({ currentPlayer, isAdmin, activeGroup, setActiveG
                     ? <img src={p.photo_url} style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:'50%'}} alt=""/>
                     : initials(p)}
                 </div>
-                <div style={{fontSize:10,fontWeight:500,color:'var(--gray-5)',lineHeight:1.2}}>{p.last_name}</div>
+                <div style={{fontSize:10,fontWeight:500,color:'var(--gray-5)',lineHeight:1.2}}>{displayFirst(p)}</div>
               </div>
             ))}
           </div>
@@ -260,7 +260,7 @@ export default function Postes({ currentPlayer, isAdmin, activeGroup, setActiveG
                 : initials(selected)}
             </div>
             <div>
-              <div style={{fontWeight:600,fontSize:15}}>{selected.first_name} {selected.last_name}</div>
+              <div style={{fontWeight:600,fontSize:15}}>{displayFirst(selected)} {selected.last_name}</div>
               <div style={{fontSize:12,color:'var(--gray-4)',marginTop:2}}>
                 <span style={{marginRight:12}}>Poste: <strong style={{color:'var(--gray-5)'}}>{selected.position || '—'}</strong></span>
                 <span>Préférence: <strong style={{color:'var(--gray-5)'}}>{selected.preferred_position || 'non renseigné'}</strong></span>

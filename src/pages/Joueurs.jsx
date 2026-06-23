@@ -117,6 +117,12 @@ export default function Joueurs({ currentPlayer, isAdmin, activeGroup, setActive
               {filtered.map(p => (
                 <div key={p.id} className={`player-card${p.status === 'pause' ? ' player-inactive' : ''}`} onClick={() => setSelected(p)}>
                   <div className="player-card-top">
+                    <span>
+                      {p.team_role === 'coach' && <span className="role-badge" style={{background:'#c0161a',color:'white'}}>CP</span>}
+                      {p.team_role === 'assistant_coach' && <span className="role-badge" style={{background:'#e05555',color:'white'}}>CA</span>}
+                      {p.team_role === 'captain' && <span className="role-badge" style={{background:'#FFD700',color:'#5a4500'}}>C</span>}
+                      {p.team_role === 'vice_captain' && <span className="role-badge" style={{background:'#aaa',color:'white'}}>C</span>}
+                    </span>
                     {p.born && <span className="player-age">{getAge(p.born)}</span>}
                   </div>
                   {p.photo_url
@@ -125,11 +131,7 @@ export default function Joueurs({ currentPlayer, isAdmin, activeGroup, setActive
                   }
                   <div className="player-name">
                     <span style={{fontWeight:700,fontSize:14,color:'var(--red)'}}>{displayFirst(p)}</span>
-                    <div style={{fontSize:11,color:'#999',lineHeight:1.2}}>{p.first_name} {p.last_name}</div>
-                    {p.team_role === 'coach' && <span className="captain-tag" style={{background:'#c0161a',color:'white'}}>CP</span>}
-                    {p.team_role === 'assistant_coach' && <span className="captain-tag" style={{background:'#e05555',color:'white'}}>CA</span>}
-                    {p.team_role === 'captain' && <span className="captain-tag" style={{background:'#FFD700',color:'#5a4500'}}>C</span>}
-                    {p.team_role === 'vice_captain' && <span className="captain-tag" style={{background:'#aaa',color:'white'}}>C</span>}
+                    <div style={{fontSize:11,color:'var(--red)',lineHeight:1.2,fontWeight:600}}>{p.first_name} {p.last_name}</div>
                   </div>
                   <div className="player-pos">{p.preferred_position || p.position || '—'}</div>
                   {p.born && <div className="player-born">{p.born.split('-').reverse().join('.')}</div>}

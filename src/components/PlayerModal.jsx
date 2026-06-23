@@ -154,46 +154,53 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
             <div className="profile-info">
               <h4>
                 {displayFirst(player)}{' '}{player.last_name}
-                {player.captain && <span className="captain-tag">Capitaine</span>}
               </h4>
               {player.nickname && (
-                <div style={{fontSize:11,color:'#999',marginTop:1}}>{player.first_name} {player.last_name}</div>
+                <div style={{fontSize:11,color:'var(--red)',marginTop:1,fontWeight:600}}>{player.first_name} {player.last_name}</div>
               )}
               <p>Seniors {player.group_name}</p>
             </div>
           </div>
 
-          {(isOwn || isAdmin) && (
+          {(isOwn || isAdmin) && !editing && (
             <button
               className="btn-red"
-              style={{width:'100%',marginBottom:14,background:editing?'var(--gray-5)':'var(--red)'}}
-              onClick={() => { if (editing) { setForm(buildForm(player)) } setEditing(!editing) }}
+              style={{width:'100%',marginBottom:14}}
+              onClick={() => setEditing(true)}
             >
-              {editing ? '✕ Annuler' : '✏️ Modifier le profil'}
+              ✏️ Modifier le profil
+            </button>
+          )}
+
+          {(isOwn || isAdmin) && editing && (
+            <button
+              className="btn-red"
+              style={{width:'100%',marginBottom:14}}
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving ? 'Enregistrement...' : 'Enregistrer'}
             </button>
           )}
 
           {editing && (isOwn || isAdmin) && (
-            <>
-              <label className="form-label">Photo</label>
-              <label className="photo-upload-label">
+            <div className="info-row" style={{alignItems:'center'}}>
+              <span className="info-label">Photo</span>
+              <label className="photo-upload-label" style={{margin:0,maxWidth:200,cursor:'pointer'}}>
                 {uploading ? 'Upload...' : '📷 Choisir une photo'}
                 <input type="file" accept="image/*" onChange={handlePhoto} style={{ display: 'none' }} />
               </label>
-              <div className="photo-hint">Photo enregistrée dans le cloud</div>
-              <label className="form-label" style={{marginTop:8}}>Surnom</label>
-              <input className="edit-field" value={form.nickname || ''} onChange={e => setForm({ ...form, nickname: e.target.value })} placeholder={player.first_name} />
-              <div style={{fontSize:10,color:'#999',marginTop:2}}>Laisser vide si identique au prénom</div>
-            </>
-          )}
-
-          {/* Surnom: Anzeige nur wenn gesetzt und nicht im Edit-Modus */}
-          {!editing && player.nickname && (
-            <div className="info-row">
-              <span className="info-label">Surnom</span>
-              <span className="info-value">{player.nickname}</span>
             </div>
           )}
+
+          {/* Surnom: reguläre Zeile, Anzeige und Inline-Edit identisch zu anderen Feldern */}
+          <div className="info-row">
+            <span className="info-label">Surnom</span>
+            {editing
+              ? <input className="edit-field" style={{margin:0,maxWidth:200}} value={form.nickname || ''} onChange={e => setForm({ ...form, nickname: e.target.value })} placeholder={player.first_name} />
+              : <span className="info-value">{player.nickname || player.first_name}</span>
+            }
+          </div>
 
           {/* Poste: Anzeige immer, Edit nur Admin */}
           <div className="info-row">
@@ -282,14 +289,7 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
             </div>
           )}
 
-          {editing && (
-            <>
-              {success && <div className="success-msg">{success}</div>}
-              <button className="btn-red" style={{width:'100%',marginTop:8}} onClick={handleSave} disabled={saving}>
-                {saving ? 'Enregistrement...' : 'Enregistrer'}
-              </button>
-            </>
-          )}
+          {editing && success && <div className="success-msg">{success}</div>}
           {!editing && success && <div className="success-msg">{success}</div>}
         </div>
       </div>
