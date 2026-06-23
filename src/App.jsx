@@ -16,40 +16,45 @@ const LOGO = 'https://fcsaintprex.ch/wp-content/uploads/2021/09/cropped-logo_fc_
 
 function AvatarImg({ player, displayName }) {
   const [photoUrl, setPhotoUrl] = React.useState(player?.photo_url ? player.photo_url.split('?')[0] : null)
+  const [imgOk, setImgOk] = React.useState(false)
 
   React.useEffect(() => {
-    if (player?.photo_url) {
-      setPhotoUrl(player.photo_url.split('?')[0])
-      return
-    }
+    if (player?.photo_url) { setPhotoUrl(player.photo_url.split('?')[0]); return }
     if (!player?.id) return
     let active = true
     supabase.from('players').select('photo_url').eq('id', player.id).single()
-      .then(({ data }) => {
-        if (active && data?.photo_url) setPhotoUrl(data.photo_url.split('?')[0])
-      })
+      .then(({ data }) => { if (active && data?.photo_url) setPhotoUrl(data.photo_url.split('?')[0]) })
     return () => { active = false }
   }, [player?.id, player?.photo_url])
 
   const initials = player
-    ? `${player.first_name?.[0] ?? ''}${player.last_name?.[0] ?? ''}`
+    ? `${player.first_name?.[0] ?? ''}${player.last_name?.[0] ?? ''}`.toUpperCase()
     : 'FC'
 
-  if (!photoUrl) {
-    return (
-      <span style={{ color: 'white', fontWeight: 700, fontSize: 14, userSelect: 'none' }}>
-        {initials}
-      </span>
-    )
-  }
-
   return (
-    <img
-      src={photoUrl}
-      alt={displayName}
-      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-      onError={() => setPhotoUrl(null)}
-    />
+    <div style={{
+      width: 34, height: 34, borderRadius: '50%', overflow: 'hidden',
+      position: 'relative', background: 'rgba(255,255,255,0.25)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center'
+    }}>
+      <span style={{
+        position: 'absolute', color: 'white', fontWeight: 700, fontSize: 13,
+        userSelect: 'none', lineHeight: 1
+      }}>{initials}</span>
+      {photoUrl && (
+        <img
+          src={photoUrl}
+          alt={displayName}
+          onLoad={() => setImgOk(true)}
+          onError={() => { setPhotoUrl(null); setImgOk(false) }}
+          style={{
+            position: 'absolute', top: 0, left: 0,
+            width: '100%', height: '100%', objectFit: 'cover',
+            opacity: imgOk ? 1 : 0, transition: 'opacity 0.15s'
+          }}
+        />
+      )}
+    </div>
   )
 }
 
@@ -191,7 +196,7 @@ export default function App() {
             style={{
               background:'none',border:'2.5px solid rgba(255,255,255,0.6)',
               borderRadius:'50%',padding:0,cursor:'pointer',
-              width:38,height:38,overflow:'hidden',flexShrink:0,
+              width:38,height:38,boxSizing:'border-box',overflow:'hidden',flexShrink:0,
               display:'flex',alignItems:'center',justifyContent:'center'
             }}
             title={displayName}
