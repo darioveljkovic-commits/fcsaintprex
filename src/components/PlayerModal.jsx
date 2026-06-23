@@ -169,7 +169,7 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
               style={{width:'100%',marginBottom:14,background:editing?'var(--gray-5)':'var(--red)'}}
               onClick={() => { if (editing) { setForm(buildForm(player)) } setEditing(!editing) }}
             >
-              {editing ? '\u2715 Annuler' : '\u270f\ufe0f Modifier le profil'}
+              {editing ? '✕ Annuler' : '✏️ Modifier le profil'}
             </button>
           )}
 
@@ -177,14 +177,22 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
             <>
               <label className="form-label">Photo</label>
               <label className="photo-upload-label">
-                {uploading ? 'Upload...' : '\ud83d\udcf7 Choisir une photo'}
+                {uploading ? 'Upload...' : '📷 Choisir une photo'}
                 <input type="file" accept="image/*" onChange={handlePhoto} style={{ display: 'none' }} />
               </label>
-              <div className="photo-hint">Photo enregistr\u00e9e dans le cloud</div>
-              <label className="form-label" style={{marginTop:8}}>Rufname</label>
+              <div className="photo-hint">Photo enregistrée dans le cloud</div>
+              <label className="form-label" style={{marginTop:8}}>Surnom</label>
               <input className="edit-field" value={form.nickname || ''} onChange={e => setForm({ ...form, nickname: e.target.value })} placeholder={player.first_name} />
-              <div style={{fontSize:10,color:'#999',marginTop:2}}>Leer lassen wenn gleich wie Vorname</div>
+              <div style={{fontSize:10,color:'#999',marginTop:2}}>Laisser vide si identique au prénom</div>
             </>
+          )}
+
+          {/* Surnom: Anzeige nur wenn gesetzt und nicht im Edit-Modus */}
+          {!editing && player.nickname && (
+            <div className="info-row">
+              <span className="info-label">Surnom</span>
+              <span className="info-value">{player.nickname}</span>
+            </div>
           )}
 
           {/* Poste: Anzeige immer, Edit nur Admin */}
@@ -192,22 +200,22 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
             <span className="info-label">Poste</span>
             {editing && isAdmin
               ? <select className="edit-field" style={{margin:0,maxWidth:200}} value={form.position || ''} onChange={e => setForm({ ...form, position: e.target.value })}>
-                  <option value="">\u2014 S\u00e9lectionner \u2014</option>
+                  <option value="">— Sélectionner —</option>
                   {positions.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
                 </select>
-              : <span className="info-value">{player.position || '\u2014'}</span>
+              : <span className="info-value">{player.position || '—'}</span>
             }
           </div>
 
-          {/* Pr\u00e9f\u00e9rence poste: Anzeige immer, Edit fuer Spieler+Admin */}
+          {/* Préférence poste: Anzeige immer, Edit fuer Spieler+Admin */}
           <div className="info-row">
-            <span className="info-label">Pr\u00e9f\u00e9rence poste</span>
+            <span className="info-label">Préférence poste</span>
             {editing
               ? <select className="edit-field" style={{margin:0,maxWidth:200}} value={form.preferred_position || ''} onChange={e => setForm({ ...form, preferred_position: e.target.value })}>
-                  <option value="">\u2014 Pr\u00e9f\u00e9rence \u2014</option>
+                  <option value="">— Préférence —</option>
                   {positions.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
                 </select>
-              : <span className="info-value">{player.preferred_position || '\u2014'}</span>
+              : <span className="info-value">{player.preferred_position || '—'}</span>
             }
           </div>
 
@@ -215,7 +223,7 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
             <span className="info-label">Profession</span>
             {editing
               ? <input className="edit-field" style={{margin:0,maxWidth:200}} value={form.job} onChange={e => setForm({ ...form, job: e.target.value })} placeholder="Votre profession" />
-              : <span className="info-value">{player.job || '\u2014'}</span>
+              : <span className="info-value">{player.job || '—'}</span>
             }
           </div>
 
@@ -223,43 +231,43 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
             <span className="info-label">Passions</span>
             {editing
               ? <input className="edit-field" style={{margin:0,maxWidth:200}} value={form.passions} onChange={e => setForm({ ...form, passions: e.target.value })} placeholder="Tennis, cuisine..." />
-              : <span className="info-value">{player.passions || '\u2014'}</span>
+              : <span className="info-value">{player.passions || '—'}</span>
             }
           </div>
 
           <div className="info-row">
-            <span className="info-label">T\u00e9l\u00e9phone</span>
+            <span className="info-label">Téléphone</span>
             {editing
               ? <input className="edit-field" style={{margin:0,maxWidth:200}} value={form.tel} onChange={e => setForm({ ...form, tel: e.target.value })} placeholder="+41 79 000 00 00" />
-              : <span className="info-value">{player.tel ? <a href={`tel:${player.tel}`} style={{ color: 'var(--red)', fontWeight: 600 }}>{player.tel}</a> : '\u2014'}</span>
+              : <span className="info-value">{player.tel ? <a href={`tel:${player.tel}`} style={{ color: 'var(--red)', fontWeight: 600 }}>{player.tel}</a> : '—'}</span>
             }
           </div>
 
           <div className="info-row">
-            <span className="info-label">N\u00e9 le</span>
+            <span className="info-label">Né le</span>
             {editing
               ? <input className="edit-field" type="date" style={{margin:0,maxWidth:200}} value={form.born || ''} onChange={e => setForm({ ...form, born: e.target.value })} />
-              : <span className="info-value">{player.born ? player.born.split('-').reverse().join('.') : '\u2014'}</span>
+              : <span className="info-value">{player.born ? player.born.split('-').reverse().join('.') : '—'}</span>
             }
           </div>
 
           {!editing && (
-            <div className="info-row"><span className="info-label">\u00c2ge</span><span className="info-value">{getAge(player.born)} ans</span></div>
+            <div className="info-row"><span className="info-label">Âge</span><span className="info-value">{getAge(player.born)} ans</span></div>
           )}
 
           <div className="info-row">
             <span className="info-label">Ville</span>
             {editing
               ? <input className="edit-field" style={{margin:0,maxWidth:200}} value={form.city || ''} onChange={e => setForm({ ...form, city: e.target.value })} placeholder="Saint-Prex, Morges..." />
-              : <span className="info-value">{player.city || '\u2014'}</span>
+              : <span className="info-value">{player.city || '—'}</span>
             }
           </div>
 
           {/* Admin-only Felder: nur im Edit-Modus und nur fuer Admin */}
           {editing && isAdmin && (
             <div style={{background:'#fdecea',borderRadius:8,padding:'10px 12px',margin:'12px 0',border:'1px solid #f5c6c6'}}>
-              <div style={{fontSize:11,fontWeight:700,color:'var(--red)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:8}}>\u2699\ufe0f Admin uniquement</div>
-              <label className="form-label">Cat\u00e9gorie d'\u00e2ge</label>
+              <div style={{fontSize:11,fontWeight:700,color:'var(--red)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:8}}>⚙️ Admin uniquement</div>
+              <label className="form-label">Catégorie d'âge</label>
               <select className="edit-field" value={form.group_name} onChange={e => setForm({ ...form, group_name: e.target.value })}>
                 <option value="+30">Seniors +30</option>
                 <option value="+40">Seniors +40</option>
@@ -267,8 +275,8 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
               </select>
               <label className="form-label">Statut</label>
               <select className="edit-field" value={form.status} onChange={e => setForm({...form, status: e.target.value})}>
-                <option value="actif">Actif \u2014 joue r\u00e9guli\u00e8rement</option>
-                <option value="pause">En pause \u2014 bless\u00e9 ou pause temporaire</option>
+                <option value="actif">Actif — joue régulièrement</option>
+                <option value="pause">En pause — blessé ou pause temporaire</option>
                 <option value="sorti">Sorti du club</option>
               </select>
             </div>

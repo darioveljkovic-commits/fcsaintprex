@@ -222,7 +222,7 @@ export default function App() {
                   onMouseEnter={e => e.currentTarget.style.background='#f9f9f9'}
                   onMouseLeave={e => e.currentTarget.style.background='none'}
                 >
-                  <span style={{fontSize:16}}>\ud83d\udc64</span> Mon profil
+                  <span style={{fontSize:16}}>👤</span> Mon profil
                 </button>
 
                 {/* Divider */}
