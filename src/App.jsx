@@ -16,7 +16,7 @@ const LOGO = 'https://fcsaintprex.ch/wp-content/uploads/2021/09/cropped-logo_fc_
 
 function AvatarImg({ player, displayName }) {
   const [photoUrl, setPhotoUrl] = React.useState(player?.photo_url ? player.photo_url.split('?')[0] : null)
-  const [imgOk, setImgOk] = React.useState(false)
+  const [state, setState] = React.useState('init')
 
   React.useEffect(() => {
     if (player?.photo_url) { setPhotoUrl(player.photo_url.split('?')[0]); return }
@@ -31,30 +31,37 @@ function AvatarImg({ player, displayName }) {
     ? `${player.first_name?.[0] ?? ''}${player.last_name?.[0] ?? ''}`.toUpperCase()
     : 'FC'
 
+  // DEBUG: temporaeres Overlay, zeigt Laufzeitzustand
+  const dbg = `P:${player ? 'y' : 'n'} U:${photoUrl ? photoUrl.slice(-18) : 'null'} L:${state}`
+
   return (
-    <div style={{
-      width: 34, height: 34, borderRadius: '50%', overflow: 'hidden',
-      position: 'relative', background: 'rgba(255,255,255,0.25)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center'
-    }}>
-      <span style={{
-        position: 'absolute', color: 'white', fontWeight: 700, fontSize: 13,
-        userSelect: 'none', lineHeight: 1
-      }}>{initials}</span>
-      {photoUrl && (
-        <img
-          src={photoUrl}
-          alt={displayName}
-          onLoad={() => setImgOk(true)}
-          onError={() => { setPhotoUrl(null); setImgOk(false) }}
-          style={{
-            position: 'absolute', top: 0, left: 0,
-            width: '100%', height: '100%', objectFit: 'cover',
-            opacity: imgOk ? 1 : 0, transition: 'opacity 0.15s'
-          }}
-        />
-      )}
-    </div>
+    <>
+      <div style={{
+        width: 34, height: 34, borderRadius: '50%', overflow: 'hidden',
+        position: 'relative', background: 'rgba(255,255,255,0.25)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center'
+      }}>
+        <span style={{ position: 'absolute', color: 'white', fontWeight: 700, fontSize: 13, lineHeight: 1 }}>{initials}</span>
+        {photoUrl && (
+          <img
+            src={photoUrl}
+            alt={displayName}
+            onLoad={() => setState('onLoad')}
+            onError={() => setState('onError')}
+            style={{
+              position: 'absolute', top: 0, left: 0,
+              width: '100%', height: '100%', objectFit: 'cover',
+              opacity: state === 'onLoad' ? 1 : 0
+            }}
+          />
+        )}
+      </div>
+      <div style={{
+        position: 'absolute', top: 44, right: 0, zIndex: 999,
+        background: 'black', color: 'lime', fontSize: 10, padding: '2px 6px',
+        borderRadius: 4, whiteSpace: 'nowrap', fontFamily: 'monospace'
+      }}>{dbg}</div>
+    </>
   )
 }
 
@@ -94,21 +101,12 @@ export default function App() {
   const loadUserData = async (user) => {
     const { data: roleData } = await supabase
       .from('user_roles')
-      .select('role, player_id')
+      .select('*, players(*)')
       .eq('user_id', user.id)
       .single()
     if (roleData) {
       setIsAdmin(roleData.role === 'admin')
-      // Player frisch und vollstaendig laden (gleicher Pfad wie Joueurs-Kachel)
-      let player = null
-      if (roleData.player_id) {
-        const { data } = await supabase
-          .from('players')
-          .select('*')
-          .eq('id', roleData.player_id)
-          .single()
-        player = data || null
-      }
+      const player = roleData.players || null
       setCurrentPlayer(player)
       if (player && activeGroup === null) setActiveGroup(player.group_name || 'all')
     }
