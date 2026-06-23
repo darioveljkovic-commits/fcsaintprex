@@ -1,32 +1,34 @@
 import { useState, useEffect } from 'react'
 import { supabase, calcVO2, vo2Level, sprintLevel, getAge } from '../lib/supabase'
 
+// Single Source of Truth: alle editierbaren Profilfelder.
+// default: Fallback im Formular. adminOnly: nur Admins duerfen speichern.
+// Aenderungen hier wirken automatisch auf form-init, sync und Speicherung.
+const PROFILE_FIELDS = [
+  { key: 'job', default: '' },
+  { key: 'tel', default: '' },
+  { key: 'passions', default: '' },
+  { key: 'preferred_position', default: '' },
+  { key: 'position', default: '', adminOnly: true },
+  { key: 'city', default: '' },
+  { key: 'status', default: 'actif' },
+  { key: 'group_name', default: '+40' },
+  { key: 'born', default: '' },
+]
+
+const buildForm = (player) =>
+  PROFILE_FIELDS.reduce((acc, f) => {
+    acc[f.key] = player[f.key] ?? f.default
+    return acc
+  }, {})
+
 export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, onUpdate }) {
   const [editing, setEditing] = useState(false)
-  const [form, setForm] = useState({
-    job: player.job || '',
-    tel: player.tel || '',
-    passions: player.passions || '',
-    preferred_position: player.preferred_position || '',
-    position: player.position || '',
-    city: player.city || '',
-    status: player.status || 'actif',
-    group_name: player.group_name || '+40',
-    born: player.born || '',
-  })
+  const [form, setForm] = useState(() => buildForm(player))
 
   // Sync form when player prop updates after save
   useEffect(() => {
-    setForm({
-      job: player.job || '',
-      born: player.born || '',
-      tel: player.tel || '',
-      passions: player.passions || '',
-      preferred_position: player.preferred_position || '',
-      position: player.position || '',
-      status: player.status || 'actif',
-      group_name: player.group_name || '+40',
-    })
+    setForm(buildForm(player))
   }, [player])
   const [positions, setPositions] = useState([])
   const [saving, setSaving] = useState(false)
@@ -52,17 +54,15 @@ export default function PlayerModal({ player, tests, isOwn, isAdmin, onClose, on
 
   const handleSave = async () => {
     setSaving(true)
-    const updateData = {
-      job: form.job || null,
-      tel: form.tel || null,
-      passions: form.passions || null,
-      preferred_position: form.preferred_position || null,
-      city: form.city || null,
-      status: form.status,
-      group_name: form.group_name,
-      born: form.born || null,
-    }
-    if (isAdmin) updateData.position = form.position || null
+    // updateData aus PROFILE_FIELDS ableiten. Pflichtfelder (status, group_name)
+    // behalten ihren Wert; optionale Felder werden bei Leer auf null gesetzt.
+    const REQUIRED = ['status', 'group_name']
+    const updateData = PROFILE_FIELDS.reduce((acc, f) => {
+      if (f.adminOnly && !isAdmin) return acc
+      const val = form[f.key]
+      acc[f.key] = REQUIRED.includes(f.key) ? val : (val || null)
+      return acc
+    }, {})
     const { error } = await supabase.from('players').update(updateData).eq('id', player.id)
     setSaving(false)
     if (!error) {
