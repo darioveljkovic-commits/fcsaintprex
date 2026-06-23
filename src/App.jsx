@@ -13,42 +13,43 @@ import './App.css'
 const LOGO = 'https://fcsaintprex.ch/wp-content/uploads/2021/09/cropped-logo_fc_saint_prex.jpg'
 
 
-const SUPABASE_URL = 'https://lymeedgkdurumfdpmitl.supabase.co'
-const SUPABASE_STORAGE = SUPABASE_URL + '/storage/v1/object/public/player-photos'
 
 function AvatarImg({ player, displayName }) {
-  const [photoUrl, setPhotoUrl] = React.useState(null)
-  const [loaded, setLoaded] = React.useState(false)
+  const [photoUrl, setPhotoUrl] = React.useState(player?.photo_url ? player.photo_url.split('?')[0] : null)
 
   React.useEffect(() => {
+    if (player?.photo_url) {
+      setPhotoUrl(player.photo_url.split('?')[0])
+      return
+    }
     if (!player?.id) return
+    let active = true
     supabase.from('players').select('photo_url').eq('id', player.id).single()
-      .then(({ data }) => { if (data?.photo_url) setPhotoUrl(data.photo_url.split('?')[0]) })
-  }, [player?.id])
+      .then(({ data }) => {
+        if (active && data?.photo_url) setPhotoUrl(data.photo_url.split('?')[0])
+      })
+    return () => { active = false }
+  }, [player?.id, player?.photo_url])
 
   const initials = player
     ? `${player.first_name?.[0] ?? ''}${player.last_name?.[0] ?? ''}`
     : 'FC'
 
+  if (!photoUrl) {
+    return (
+      <span style={{ color: 'white', fontWeight: 700, fontSize: 14, userSelect: 'none' }}>
+        {initials}
+      </span>
+    )
+  }
+
   return (
-    <div style={{width:'100%',height:'100%',position:'relative',overflow:'hidden'}}>
-      {photoUrl && (
-        <img
-          src={photoUrl}
-          alt={displayName}
-          style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}
-          onLoad={() => setLoaded(true)}
-          onError={() => setPhotoUrl(null)}
-        />
-      )}
-      {(!photoUrl || !loaded) && (
-        <span style={{
-          position:'absolute',inset:0,
-          display:'flex',alignItems:'center',justifyContent:'center',
-          color:'white',fontWeight:700,fontSize:14
-        }}>{initials}</span>
-      )}
-    </div>
+    <img
+      src={photoUrl}
+      alt={displayName}
+      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+      onError={() => setPhotoUrl(null)}
+    />
   )
 }
 
@@ -64,7 +65,6 @@ export default function App() {
   const [pwLoading, setPwLoading] = useState(false)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [showPrivacy, setShowPrivacy] = useState(false)
-  const [forcePwChange, setForcePwChange] = useState(false)
   const [activeGroup, setActiveGroup] = useState(null)
 
   useEffect(() => {
@@ -87,24 +87,25 @@ export default function App() {
   }, [])
 
   const loadUserData = async (user) => {
-    const { data: roleData } = await supabase.from('user_roles').select('*, players(*)').eq('user_id', user.id).single()
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role, player_id')
+      .eq('user_id', user.id)
+      .single()
     if (roleData) {
       setIsAdmin(roleData.role === 'admin')
-      let player = roleData.players || null
-      // Falls photo_url im JOIN fehlt: aus Storage-Name konstruieren
-      if (player && !player.photo_url && player.last_name && player.first_name) {
-        const key = (player.last_name + '_' + player.first_name)
-          .toLowerCase()
-          .normalize('NFD').replace(/[̀-ͯ]/g, '')
-          .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')
-        player = { ...player, photo_url: SUPABASE_URL + '/storage/v1/object/public/player-photos/' + key + '.jpg' }
+      // Player frisch und vollstaendig laden (gleicher Pfad wie Joueurs-Kachel)
+      let player = null
+      if (roleData.player_id) {
+        const { data } = await supabase
+          .from('players')
+          .select('*')
+          .eq('id', roleData.player_id)
+          .single()
+        player = data || null
       }
       setCurrentPlayer(player)
       if (player && activeGroup === null) setActiveGroup(player.group_name || 'all')
-      // Force PW change if player hasn't set their own password yet
-      if (player && player.pw_changed === false) {
-        setForcePwChange(true)
-      }
     }
     setLoading(false)
   }
