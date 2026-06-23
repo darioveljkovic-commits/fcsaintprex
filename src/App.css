@@ -172,7 +172,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .field-name { font-size: 8px; font-weight: 600; color: white; background: rgba(0,0,0,0.6); padding: 1px 4px; border-radius: 3px; white-space: nowrap; max-width: 60px; overflow: hidden; text-overflow: ellipsis; }
 
 .player-card-top { position: absolute; top: 8px; right: 8px; }
-.role-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; margin-left: 4px; vertical-align: middle; }
+.role-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
 .player-card { position: relative; }
 .player-age { font-size: 11px; font-weight: 700; color: var(--red); background: var(--red-light); padding: 1px 6px; border-radius: 10px; }
 .player-born { font-size: 10px; color: var(--gray-4); margin-top: 2px; }

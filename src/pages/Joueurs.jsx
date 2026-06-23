@@ -124,11 +124,13 @@ export default function Joueurs({ currentPlayer, isAdmin, activeGroup, setActive
                     : <div className="player-avatar">{initials(p)}</div>
                   }
                   <div className="player-name">
-                    <span style={{fontWeight:700,fontSize:14,color:'var(--red)'}}>{displayFirst(p)}</span>
-                    {p.team_role === 'coach' && <span className="role-badge" style={{background:'#c0161a',color:'white'}}>CP</span>}
-                    {p.team_role === 'assistant_coach' && <span className="role-badge" style={{background:'#e05555',color:'white'}}>CA</span>}
-                    {p.team_role === 'captain' && <span className="role-badge" style={{background:'#FFD700',color:'#5a4500'}}>C</span>}
-                    {p.team_role === 'vice_captain' && <span className="role-badge" style={{background:'#aaa',color:'white'}}>C</span>}
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:5}}>
+                      <span style={{fontWeight:700,fontSize:14,color:'var(--red)'}}>{displayFirst(p)}</span>
+                      {p.team_role === 'coach' && <span className="role-badge" style={{background:'#c0161a',color:'white'}}>CP</span>}
+                      {p.team_role === 'assistant_coach' && <span className="role-badge" style={{background:'#e05555',color:'white'}}>CA</span>}
+                      {p.team_role === 'captain' && <span className="role-badge" style={{background:'#FFD700',color:'#5a4500'}}>C</span>}
+                      {p.team_role === 'vice_captain' && <span className="role-badge" style={{background:'#aaa',color:'white'}}>C</span>}
+                    </div>
                     <div style={{fontSize:11,color:'var(--red)',lineHeight:1.2,fontWeight:600}}>{p.first_name} {p.last_name}</div>
                   </div>
                   <div className="player-pos">{p.preferred_position || p.position || '—'}</div>
