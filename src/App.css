@@ -171,7 +171,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .field-avatar.field-gk { background: #FFD700; border-color: #8b8000; color: #5a4500; }
 .field-name { font-size: 8px; font-weight: 600; color: white; background: rgba(0,0,0,0.6); padding: 1px 4px; border-radius: 3px; white-space: nowrap; max-width: 60px; overflow: hidden; text-overflow: ellipsis; }
 
-.player-card-top { position: absolute; top: 8px; left: 8px; right: 8px; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
+.player-card-top { position: absolute; top: 8px; right: 8px; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; pointer-events: none; }
 .role-badge { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
 .player-card { position: relative; }
 .player-age { font-size: 11px; font-weight: 700; color: var(--red); background: var(--red-light); padding: 1px 6px; border-radius: 10px; }
