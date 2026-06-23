@@ -16,7 +16,6 @@ const LOGO = 'https://fcsaintprex.ch/wp-content/uploads/2021/09/cropped-logo_fc_
 
 function AvatarImg({ player, displayName }) {
   const [photoUrl, setPhotoUrl] = React.useState(player?.photo_url ? player.photo_url.split('?')[0] : null)
-  const [state, setState] = React.useState('init')
 
   React.useEffect(() => {
     if (player?.photo_url) { setPhotoUrl(player.photo_url.split('?')[0]); return }
@@ -31,37 +30,17 @@ function AvatarImg({ player, displayName }) {
     ? `${player.first_name?.[0] ?? ''}${player.last_name?.[0] ?? ''}`.toUpperCase()
     : 'FC'
 
-  // DEBUG: temporaeres Overlay, zeigt Laufzeitzustand
-  const dbg = `P:${player ? 'y' : 'n'} U:${photoUrl ? photoUrl.slice(-18) : 'null'} L:${state}`
+  if (!photoUrl) {
+    return <span style={{ color: 'white', fontWeight: 700, fontSize: 14, lineHeight: 1 }}>{initials}</span>
+  }
 
   return (
-    <>
-      <div style={{
-        width: 34, height: 34, borderRadius: '50%', overflow: 'hidden',
-        position: 'relative', background: 'rgba(255,255,255,0.25)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center'
-      }}>
-        <span style={{ position: 'absolute', color: 'white', fontWeight: 700, fontSize: 13, lineHeight: 1 }}>{initials}</span>
-        {photoUrl && (
-          <img
-            src={photoUrl}
-            alt={displayName}
-            onLoad={() => setState('onLoad')}
-            onError={() => setState('onError')}
-            style={{
-              position: 'absolute', top: 0, left: 0,
-              width: '100%', height: '100%', objectFit: 'cover',
-              opacity: state === 'onLoad' ? 1 : 0
-            }}
-          />
-        )}
-      </div>
-      <div style={{
-        position: 'absolute', top: 44, right: 0, zIndex: 999,
-        background: 'black', color: 'lime', fontSize: 10, padding: '2px 6px',
-        borderRadius: 4, whiteSpace: 'nowrap', fontFamily: 'monospace'
-      }}>{dbg}</div>
-    </>
+    <img
+      src={photoUrl}
+      alt={displayName}
+      onError={() => setPhotoUrl(null)}
+      style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'cover', display: 'block' }}
+    />
   )
 }
 
