@@ -131,7 +131,7 @@ export default function Joueurs({ currentPlayer, isAdmin, activeGroup, setActive
                       {p.team_role === 'captain' && <span className="role-badge" style={{background:'#FFD700',color:'#5a4500'}}>C</span>}
                       {p.team_role === 'vice_captain' && <span className="role-badge" style={{background:'#aaa',color:'white'}}>C</span>}
                     </div>
-                    <div style={{fontSize:11,color:'var(--red)',lineHeight:1.2,fontWeight:600}}>{p.first_name} {p.last_name}</div>
+                    <div style={{fontSize:11,color:'#333',lineHeight:1.2,fontWeight:600}}>{p.first_name} {p.last_name}</div>
                   </div>
                   <div className="player-pos">{p.preferred_position || p.position || '—'}</div>
                   {p.born && <div className="player-born">{p.born.split('-').reverse().join('.')}</div>}
