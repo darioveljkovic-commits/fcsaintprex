@@ -18,10 +18,11 @@ export default function Admin() {
   const [positions, setPositions] = useState([])
   const [addingPlayer, setAddingPlayer] = useState(false)
   const [playerSuccess, setPlayerSuccess] = useState('')
-  const [inviteEmail, setInviteEmail] = useState('')
   const [invitePlayer, setInvitePlayer] = useState('')
+  const [inviteUuid, setInviteUuid] = useState('')
   const [inviteSuccess, setInviteSuccess] = useState('')
   const [inviteError, setInviteError] = useState('')
+  const [inviteLoading, setInviteLoading] = useState(false)
 
   useEffect(() => {
     supabase.from('players').select('*').neq('status', 'sorti').order('last_name').then(({ data }) => setPlayers(data || []))
@@ -82,35 +83,44 @@ export default function Admin() {
     }
   }
 
-  const handleInvite = () => {
-    if (!invitePlayer || !inviteEmail) return
-    const p = players.find(x => x.id === invitePlayer)
-    const sql = `-- Joueur: ${p?.first_name} ${p?.last_name} — Email: ${inviteEmail}
---
--- ÉTAPES:
--- 1. Supabase → Authentication → Users → "Add user" → email: ${inviteEmail} + mot de passe temporaire
--- 2. Clique sur le nouvel utilisateur → copie son UUID
--- 3. Remplace COLLER_UUID_ICI par l'UUID copié
--- 4. Exécute ce SQL
-
-INSERT INTO user_roles (user_id, role, player_id)
-VALUES ('COLLER_UUID_ICI', 'player', '${invitePlayer}')
-ON CONFLICT (user_id) DO UPDATE SET role = 'player', player_id = '${invitePlayer}';
-
-UPDATE players SET 
-  user_id = 'COLLER_UUID_ICI',
-  pw_changed = false,
-  consent_given = false
-WHERE id = '${invitePlayer}';
-
--- Vérification
-SELECT p.first_name, p.last_name, p.pw_changed, p.consent_given, ur.role
-FROM players p
-LEFT JOIN user_roles ur ON ur.player_id = p.id
-WHERE p.id = '${invitePlayer}';`
-
-    setInviteSuccess(sql)
+  const handleInvite = async () => {
+    if (!invitePlayer || !inviteUuid.trim()) return
+    setInviteLoading(true)
     setInviteError('')
+    setInviteSuccess('')
+
+    const uuid = inviteUuid.trim()
+
+    // 1. user_roles eintragen
+    const { error: roleError } = await supabase
+      .from('user_roles')
+      .upsert({ user_id: uuid, role: 'player', player_id: invitePlayer }, { onConflict: 'user_id' })
+
+    if (roleError) {
+      setInviteError('Erreur user_roles: ' + roleError.message)
+      setInviteLoading(false)
+      return
+    }
+
+    // 2. player aktualisieren
+    const { error: playerError } = await supabase
+      .from('players')
+      .update({ user_id: uuid, pw_changed: false, consent_given: false })
+      .eq('id', invitePlayer)
+
+    setInviteLoading(false)
+    if (playerError) {
+      setInviteError('Erreur player update: ' + playerError.message)
+    } else {
+      const p = players.find(x => x.id === invitePlayer)
+      setInviteSuccess(`✅ ${p?.first_name} ${p?.last_name} est lié à l'UUID. Il peut maintenant se connecter.`)
+      setInviteUuid('')
+      setInvitePlayer('')
+      // Spielerliste neu laden
+      const { data } = await supabase.from('players').select('*').neq('status', 'sorti').order('last_name')
+      setPlayers(data || [])
+      setTimeout(() => setInviteSuccess(''), 5000)
+    }
   }
 
   const filteredPlayers = players
@@ -262,19 +272,12 @@ WHERE p.id = '${invitePlayer}';`
 
       {/* INVITER UN JOUEUR */}
       <div className="card">
-        <div className="card-title">✉️ Inviter un joueur</div>
+        <div className="card-title">✉️ Lier un joueur à un compte</div>
         <p style={{fontSize:13,color:'var(--gray-4)',marginBottom:14,lineHeight:1.6}}>
-          Procédure :<br/>
-          1. Entre l'email du joueur et sélectionne son profil<br/>
-          2. Copie le SQL généré et exécute-le dans Supabase<br/>
-          3. Dans Supabase → Authentication → Users → "Invite User" avec la même email<br/>
-          4. Envoie le lien Magic Link au joueur via WhatsApp
+          1. Crée le compte dans Supabase → Authentication → Users → Add user<br/>
+          2. Copie l'UUID du nouvel utilisateur<br/>
+          3. Sélectionne le joueur et colle l'UUID ci-dessous
         </p>
-        <div className="form-group">
-          <label className="form-label">Email du joueur</label>
-          <input className="form-input" type="email" placeholder="joueur@email.com"
-            value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} />
-        </div>
         <div className="form-group">
           <label className="form-label">Joueur à lier</label>
           <select className="form-input" value={invitePlayer} onChange={e => setInvitePlayer(e.target.value)}>
@@ -284,30 +287,15 @@ WHERE p.id = '${invitePlayer}';`
             ))}
           </select>
         </div>
-        <button className="btn-red" onClick={handleInvite} disabled={!invitePlayer || !inviteEmail}>
-          Générer le SQL
+        <div className="form-group">
+          <label className="form-label">UUID Supabase</label>
+          <input className="form-input" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+            value={inviteUuid} onChange={e => setInviteUuid(e.target.value)} />
+        </div>
+        <button className="btn-red" onClick={handleInvite} disabled={inviteLoading || !invitePlayer || !inviteUuid.trim()}>
+          {inviteLoading ? 'Liaison en cours...' : 'Lier le joueur'}
         </button>
-        {inviteSuccess && (
-          <div style={{marginTop:12}}>
-            <div style={{fontSize:12,fontWeight:600,color:'var(--gray-5)',marginBottom:6}}>
-              SQL à exécuter dans Supabase → SQL Editor :
-            </div>
-            <pre style={{fontSize:11,background:'var(--gray-1)',padding:12,borderRadius:8,
-              whiteSpace:'pre-wrap',color:'var(--gray-5)',border:'1px solid var(--gray-3)',
-              cursor:'pointer',userSelect:'all'}}
-              onClick={e => {
-                const range = document.createRange()
-                range.selectNode(e.target)
-                window.getSelection().removeAllRanges()
-                window.getSelection().addRange(range)
-              }}
-              title="Cliquer pour sélectionner tout"
-            >{inviteSuccess}</pre>
-            <p style={{fontSize:11,color:'var(--gray-4)',marginTop:6}}>
-              Clique sur le SQL pour tout sélectionner, puis copie-le.
-            </p>
-          </div>
-        )}
+        {inviteSuccess && <div className="success-msg" style={{marginTop:8}}>{inviteSuccess}</div>}
         {inviteError && <div className="error-msg" style={{marginTop:8}}>{inviteError}</div>}
       </div>    </div>
   )
